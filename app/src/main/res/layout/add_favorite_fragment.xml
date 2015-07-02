@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textViewCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/llTextViewCustom"
+            android:text="@string/addCity" />
+
+        <LinearLayout
+            android:id="@+id/llTextViewCustom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerInParent="true">
+
+            <mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextView
+                android:id="@+id/atv_places_add_fav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Enter Place Here"/>
+            <Button
+                android:id="@+id/addFavoSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:onClick="run"
+                android:text="@string/ok" />
+
+        </LinearLayout>
+
+
+
+
+</RelativeLayout>

@@ -1,0 +1,288 @@
+{
+  "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "coord": {
+      "lon": 2.3488,
+      "lat": 48.853409
+    },
+    "country": "FR",
+    "population": 0,
+    "sys": {
+      "population": 0
+    }
+  },
+  "cod": "200",
+  "message": 0.0139,
+  "cnt": 8,
+  "list": [
+    {
+      "dt": 1435784400,
+      "main": {
+        "temp": 27.82,
+        "temp_min": 27.82,
+        "temp_max": 28.35,
+        "pressure": 1015.98,
+        "sea_level": 1027.23,
+        "grnd_level": 1015.98,
+        "humidity": 52,
+        "temp_kf": -0.53
+      },
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "light rain",
+          "icon": "10n"
+        }
+      ],
+      "clouds": {
+        "all": 0
+      },
+      "wind": {
+        "speed": 1.62,
+        "deg": 227
+      },
+      "rain": {
+        "3h": 0.14
+      },
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2015-07-01 21:00:00"
+    },
+    {
+      "dt": 1435795200,
+      "main": {
+        "temp": 24.66,
+        "temp_min": 24.66,
+        "temp_max": 25.06,
+        "pressure": 1018.05,
+        "sea_level": 1029.17,
+        "grnd_level": 1018.05,
+        "humidity": 51,
+        "temp_kf": -0.4
+      },
+      "weather": [
+        {
+          "id": 800,
+          "main": "Clear",
+          "description": "sky is clear",
+          "icon": "01n"
+        }
+      ],
+      "clouds": {
+        "all": 0
+      },
+      "wind": {
+        "speed": 3.86,
+        "deg": 269.004
+      },
+      "rain": {},
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2015-07-02 00:00:00"
+    },
+    {
+      "dt": 1435806000,
+      "main": {
+        "temp": 20.24,
+        "temp_min": 20.24,
+        "temp_max": 20.5,
+        "pressure": 1019.25,
+        "sea_level": 1030.51,
+        "grnd_level": 1019.25,
+        "humidity": 70,
+        "temp_kf": -0.27
+      },
+      "weather": [
+        {
+          "id": 800,
+          "main": "Clear",
+          "description": "sky is clear",
+          "icon": "01n"
+        }
+      ],
+      "clouds": {
+        "all": 0
+      },
+      "wind": {
+        "speed": 3.3,
+        "deg": 337.511
+      },
+      "rain": {},
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2015-07-02 03:00:00"
+    },
+    {
+      "dt": 1435816800,
+      "main": {
+        "temp": 20.13,
+        "temp_min": 20.13,
+        "temp_max": 20.26,
+        "pressure": 1021.19,
+        "sea_level": 1032.48,
+        "grnd_level": 1021.19,
+        "humidity": 65,
+        "temp_kf": -0.13
+      },
+      "weather": [
+        {
+          "id": 803,
+          "main": "Clouds",
+          "description": "broken clouds",
+          "icon": "04d"
+        }
+      ],
+      "clouds": {
+        "all": 76
+      },
+      "wind": {
+        "speed": 3.41,
+        "deg": 342.001
+      },
+      "rain": {},
+      "sys": {
+        "pod": "d"
+      },
+      "dt_txt": "2015-07-02 06:00:00"
+    },
+    {
+      "dt": 1435827600,
+      "main": {
+        "temp": 25.27,
+        "temp_min": 25.27,
+        "temp_max": 25.27,
+        "pressure": 1022.31,
+        "sea_level": 1033.26,
+        "grnd_level": 1022.31,
+        "humidity": 44,
+        "temp_kf": 0
+      },
+      "weather": [
+        {
+          "id": 803,
+          "main": "Clouds",
+          "description": "broken clouds",
+          "icon": "04d"
+        }
+      ],
+      "clouds": {
+        "all": 76
+      },
+      "wind": {
+        "speed": 3.01,
+        "deg": 1.00864
+      },
+      "rain": {},
+      "sys": {
+        "pod": "d"
+      },
+      "dt_txt": "2015-07-02 09:00:00"
+    },
+    {
+      "dt": 1435838400,
+      "main": {
+        "temp": 27.32,
+        "temp_min": 27.32,
+        "temp_max": 27.32,
+        "pressure": 1022.82,
+        "sea_level": 1033.7,
+        "grnd_level": 1022.82,
+        "humidity": 44,
+        "temp_kf": 0
+      },
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "light rain",
+          "icon": "10d"
+        }
+      ],
+      "clouds": {
+        "all": 92
+      },
+      "wind": {
+        "speed": 4.81,
+        "deg": 350.002
+      },
+      "rain": {
+        "3h": 0.22
+      },
+      "sys": {
+        "pod": "d"
+      },
+      "dt_txt": "2015-07-02 12:00:00"
+    },
+    {
+      "dt": 1435849200,
+      "main": {
+        "temp": 29.02,
+        "temp_min": 29.02,
+        "temp_max": 29.02,
+        "pressure": 1022.22,
+        "sea_level": 1033.06,
+        "grnd_level": 1022.22,
+        "humidity": 36,
+        "temp_kf": 0
+      },
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "overcast clouds",
+          "icon": "04d"
+        }
+      ],
+      "clouds": {
+        "all": 92
+      },
+      "wind": {
+        "speed": 6.1,
+        "deg": 39.002
+      },
+      "rain": {},
+      "sys": {
+        "pod": "d"
+      },
+      "dt_txt": "2015-07-02 15:00:00"
+    },
+    {
+      "dt": 1435860000,
+      "main": {
+        "temp": 29.64,
+        "temp_min": 29.64,
+        "temp_max": 29.64,
+        "pressure": 1021.91,
+        "sea_level": 1032.82,
+        "grnd_level": 1021.91,
+        "humidity": 36,
+        "temp_kf": 0
+      },
+      "weather": [
+        {
+          "id": 801,
+          "main": "Clouds",
+          "description": "few clouds",
+          "icon": "02d"
+        }
+      ],
+      "clouds": {
+        "all": 24
+      },
+      "wind": {
+        "speed": 4.83,
+        "deg": 41.0095
+      },
+      "rain": {},
+      "sys": {
+        "pod": "d"
+      },
+      "dt_txt": "2015-07-02 18:00:00"
+    }
+  ]
+}
