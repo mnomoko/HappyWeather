@@ -11,7 +11,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import mnomoko.android.com.happyweather.R;
-import mnomoko.android.com.happyweather.data.loader.DownloadImageTask;
 import mnomoko.android.com.happyweather.model.Weather;
 
 /**
@@ -51,7 +50,9 @@ public class DailyAdapter extends ArrayAdapter<Weather> {
         }
 
         String ic = data.get(position).getImage();
-        new DownloadImageTask(holder.image).execute(ic + ".png");
+//        new DownloadImageTask(holder.image).execute(ic + ".png");
+        holder.image.setImageResource(getContext().getResources().getIdentifier("_"+ic, "drawable", getContext().getPackageName()));
+
 //        holder.image.setImageResource(resID);
         holder.date.setText((CharSequence) data.get(position).getDate());
         StringBuilder sb = new StringBuilder();

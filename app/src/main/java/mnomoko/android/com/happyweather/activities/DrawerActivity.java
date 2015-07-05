@@ -2,6 +2,7 @@ package mnomoko.android.com.happyweather.activities;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,37 +13,49 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
+import android.support.v7.widget.SearchView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
-import java.util.Locale;
 
 import mnomoko.android.com.happyweather.R;
+import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
+import mnomoko.android.com.happyweather.database.City;
+import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 import mnomoko.android.com.happyweather.fragment.FavoriteFragment;
 import mnomoko.android.com.happyweather.fragment.HomeFragment;
 import mnomoko.android.com.happyweather.fragment.SearchFragment;
+import mnomoko.android.com.happyweather.fragment.parent.FragmentHanger;
 
 /**
  * Created by mnomoko on 28/06/15.
  */
-public class DrawerActivity extends AppCompatActivity {
+public class DrawerActivity extends AppCompatActivity implements FragmentHanger.TaskStatusCallback, SearchView.OnQueryTextListener, TextWatcher {
 
     public static final String APP_DATA = "Application_Happy_Weather";
     public static final String APP_DATA_LIVING_CITY = "Application_Happy_Weather_Living_City";
     public static final String APP_DATA_FAVORITES_CITY = "Application_Happy_Weather_Favorites_City";
+
+    public static Context context;
 
     public FrameLayout frameLayout;
     private DrawerLayout mDrawerLayout;
@@ -53,12 +66,57 @@ public class DrawerActivity extends AppCompatActivity {
     private CharSequence mTitle;
     private String[] mPlanetTitles;
 
+    private HomeFragment homeFragment;
+    private FavoriteFragment favoriteFragment;
+    private  SearchFragment searchFragment;
+
+    ActionBar actionBar;
+    private SearchView searchView;
+
     public SharedPreferences sharedpreferences;
+
+    //FOR AUTOCOMPLETE DB
+    public CustomAutoCompleteTextViewDB myAutoComplete;
+
+    // for database operations
+    public MySqlLiteHelper databaseH;
+
+    //FIN AUTOCUSTOM DB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_main);
+
+        context = getBaseContext();
+
+        if(savedInstanceState == null)
+        {
+            homeFragment = new HomeFragment();
+            favoriteFragment = new FavoriteFragment();
+
+//            mFragmentManager = getSupportFragmentManager();
+//            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+//
+//            FragmentOne fragment = new FragmentOne();
+//
+//            fragmentTransaction.add(R.id.fragment_container, fragment);
+//            fragmentTransaction.commit();
+        }
+
+        //FOR DB AUTOCOMPLETE
+        // instantiate database handler
+        databaseH = new MySqlLiteHelper(this);
+//
+//        actionBar = getSupportActionBar();
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.setDisplayShowCustomEnabled(true);
+
+//        LayoutInflater inflator = (LayoutInflater) this
+//                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View v = inflator.inflate(R.layout.actionbar, null);
+//
+//        actionBar.setCustomView(v);
 
         frameLayout = (FrameLayout)findViewById(R.id.container);
 
@@ -107,10 +165,59 @@ public class DrawerActivity extends AppCompatActivity {
         }
     }
 
+    public ArrayAdapter<City> getArrayAdapter() {
+        if(searchFragment != null) {
+            return searchFragment.getArrayAdapter();
+        }
+        return null;
+    }
+
+    public void setArrayAdapter(ArrayAdapter<City> adapter) {
+        if(searchFragment != null) {
+            searchFragment.setArrayAdapter(adapter);
+        }
+    }
+
+    public CustomAutoCompleteTextViewDB getMyAutoComplete() {
+        if(searchFragment != null) {
+            return searchFragment.getMyAutoComplete();
+        }
+        return null;
+    }
+
+    public void setMyAutoComplete(CustomAutoCompleteTextViewDB myAutoComplete) {
+        if(searchFragment != null) {
+            searchFragment.setMyAutoComplete(myAutoComplete);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
+//        searchAction = menu.add(0, SEARCH_ACTION_ID, 0 , getString(R.string.action_search));
+//        searchAction.setShowAsAction(SHOW_AS_ACTION_ALWAYS | SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+//        searchView = new CustomSearchView(getBaseContext());
+//        searchView.setOnQueryTextListener(searchQueryListener);
+//        searchView.setIconifiedByDefault(true);
+//        searchAction.setActionView(searchView);
+
+//        /*final SearchView */searchView = (SearchView) menu.findItem(R.id.action_websearch).getActionView();
+//        final SearchManager manager = (SearchManager) getSystemService(SEARCH_SERVICE);
+//        searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+//        searchView.setOnQueryTextListener(this);
+//
+//        final int resource_edit_text = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+//        ((EditText) searchView.findViewById(resource_edit_text)).addTextChangedListener(this);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.action_websearch).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -123,6 +230,10 @@ public class DrawerActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    public void seeHourlyWeather(View v) {
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -133,9 +244,10 @@ public class DrawerActivity extends AppCompatActivity {
         // Handle action buttons
         switch(item.getItemId()) {
             case R.id.action_websearch:
+                searchView.setIconified(false);
                 // create intent to perform web search for this planet
                 Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
+                intent.putExtra(SearchManager.QUERY, getSupportActionBar().getTitle());
                 // catch event that there's no activity to handle intent
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
@@ -148,6 +260,26 @@ public class DrawerActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onPreExecute() {
+
+    }
+
+    @Override
+    public void onProgressUpdate(int progress) {
+
+    }
+
+    @Override
+    public void onPostExecute() {
+
+    }
+
+    @Override
+    public void onCancelled() {
+
+    }
+
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -158,21 +290,34 @@ public class DrawerActivity extends AppCompatActivity {
 
     private void selectItem(int position) {
 
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         Fragment fragment;
 
         switch (position) {
             case 0:
-                fragment = new HomeFragment();
+//                fragment = new HomeFragment();
+                if(homeFragment == null) {
+                    homeFragment = new HomeFragment();
+                }
+                fragment = homeFragment;
                 ft.replace(R.id.container, fragment).commit();
                 break;
             case 1:
-                fragment = new FavoriteFragment();
+//                fragment = new FavoriteFragment();
+                if(favoriteFragment == null) {
+                    favoriteFragment = new FavoriteFragment();
+                }
+                fragment = favoriteFragment;
                 ft.replace(R.id.container, fragment).commit();
                 break;
             case 2:
-                fragment = new SearchFragment();
+//                fragment = new SearchFragment();
+                if(searchFragment == null) {
+                    searchFragment = new SearchFragment();
+                }
+                fragment = searchFragment;
                 ft.replace(R.id.container, fragment).commit();
                 break;
         }
@@ -251,31 +396,6 @@ public class DrawerActivity extends AppCompatActivity {
         return null;
     }
 
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
-    public static class PlanetFragment extends Fragment {
-        public static final String ARG_PLANET_NUMBER = "planet_number";
-
-        public PlanetFragment() {
-            // Empty constructor required for fragment subclasses
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_planet, container, false);
-            int i = getArguments().getInt(ARG_PLANET_NUMBER);
-            String planet = getResources().getStringArray(R.array.titles_array)[i];
-
-            int imageId = getResources().getIdentifier(planet.toLowerCase(Locale.getDefault()),
-                    "drawable", getActivity().getPackageName());
-            ((ImageView) rootView.findViewById(R.id.image)).setImageResource(imageId);
-            getActivity().setTitle(planet);
-            return rootView;
-        }
-    }
-
     public void dialogErrorCity() {
         new AlertDialog.Builder(DrawerActivity.this)
                 .setTitle("Ville non trouv�e")
@@ -287,5 +407,85 @@ public class DrawerActivity extends AppCompatActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    // Implementation of TextWatcher, used to have a proper onQueryTextChange (it doesn't update when the last character is removed)
+    @Override
+    public void beforeTextChanged (final CharSequence charSequence, final int start, final int count, final int after) {}
+
+    @Override
+    public void onTextChanged (final CharSequence charSequence, final int start, final int before, final int after) {}
+
+    @Override
+    public void afterTextChanged (final Editable editable) {
+        if (editable.length() > 0)
+            onQueryTextChange(editable.toString());
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        Toast.makeText(getBaseContext(), s, Toast.LENGTH_LONG).show();
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        Toast.makeText(getBaseContext(), s, Toast.LENGTH_LONG).show();
+        return false;
+    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+//        mSearchView.setOnQueryTextListener(this);
+//
+//        return true;
+//    }
+
+    /** Reading contents of the temporary file, if already exists */
+    public static String readCacheFile(String path) {
+
+        File cDir = context.getCacheDir();
+        path = cDir + "/" + path;
+
+
+        String strLine="";
+        StringBuilder text = new StringBuilder();
+        try {
+            FileReader fReader = new FileReader(new File(path));
+            BufferedReader bReader = new BufferedReader(fReader);
+
+            /** Reading the contents of the file , line by line */
+            while ((strLine = bReader.readLine()) != null) {
+                text.append(strLine + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return text.toString();
+    }
+
+    public static void writeCacheFile(String path, String content) {
+
+        File cDir = context.getCacheDir();
+        path = cDir + "/" + path;
+
+        FileWriter writer=null;
+        try {
+            writer = new FileWriter(path);
+
+            /** Saving the contents to the file*/
+            writer.write(content);
+
+            /** Closing the writer object */
+            writer.close();
+
+//            Toast.makeText(context, "Temporary save here : " + path, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

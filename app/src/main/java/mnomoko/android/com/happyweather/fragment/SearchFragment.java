@@ -1,32 +1,25 @@
 package mnomoko.android.com.happyweather.fragment;
 
-import android.app.AlertDialog;
-import android.support.v4.app.Fragment;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import mnomoko.android.com.happyweather.R;
+import mnomoko.android.com.happyweather.activities.DrawerActivity;
+import mnomoko.android.com.happyweather.adapters.AutocompleteDBCustomArrayAdapter;
+import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
+import mnomoko.android.com.happyweather.algorithme.CustomTextChangeListner;
+import mnomoko.android.com.happyweather.database.City;
+import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 
 /**
  * Created by mnomoko on 28/06/15.
@@ -37,32 +30,109 @@ public class SearchFragment extends Fragment {
     EditText city;
     String citizen;
 
+    MySqlLiteHelper databaseH;
+    CustomAutoCompleteTextViewDB myAutoComplete;
+    ArrayAdapter<City> myAdapter;
+
+//    TextView tvWriteText;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        setContentView(R.layout.search_weather);
 
-        View root = inflater.inflate(R.layout.search_location, null);
+        View root = inflater.inflate(R.layout.search_fragment, null);
 
-        ViewGroup parent = (ViewGroup) root.findViewById(R.id.container);
+//        ViewGroup parent = (ViewGroup) root.findViewById(R.id.container);
 
-        city = (EditText) root.findViewById(R.id.editTextCitySearch);
+//        city = (EditText) root.findViewById(R.id.editTextCitySearch);
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        try{
+
+            // instantiate database handler
+            databaseH = new MySqlLiteHelper((DrawerActivity)getActivity());
+
+            // autocompletetextview is in activity_main.xml
+            myAutoComplete = (CustomAutoCompleteTextViewDB) root.findViewById(R.id.myautocomplete);
+
+//            tvWriteText = (TextView) root.findViewById(R.id.editTextCitySearch);
+
+            myAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
+
+                    LinearLayout rl = (LinearLayout) arg1;
+                    TextView tv = (TextView) rl.getChildAt(0);
+                    TextView tv2 = (TextView) rl.getChildAt(1);
+                    myAutoComplete.setText(tv.getText().toString());
+
+                    String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
+
+                    Bundle bundle=new Bundle();
+                    bundle.putString("city", "city");
+                    //set Fragmentclass Arguments
+                    ResultFragment resultFragment=new ResultFragment();
+                    resultFragment.setArguments(bundle);
+
+                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
+                    getChildFragmentManager().executePendingTransactions();
+
+                    Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
+                }
+
+            });
+
+            // add the listener so it will tries to suggest while the user types
+            myAutoComplete.addTextChangedListener(new CustomTextChangeListner((DrawerActivity)getActivity()));
+
+            // ObjectItemData has no value at first
+            City[] ObjectItemData = new City[0];
+
+            // set the custom ArrayAdapter
+            myAdapter = new AutocompleteDBCustomArrayAdapter((DrawerActivity)getActivity(), ObjectItemData);
+            myAutoComplete.setAdapter(myAdapter);
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        return super.onCreateView(inflater, container, savedInstanceState);
+
+        return root;
     }
 
-    public void finder(View view){
-        citizen  = city.getText().toString();
-
-        String uri = "http://www.openweathermap.org/data/2.5/weather?q=" + citizen;
-
-        new RequestTask().execute(uri);
-        Intent it = new Intent(getActivity(), null);
-        it.putExtra("city", citizen);
-        startActivity(it);
-
+    public ArrayAdapter<City> getArrayAdapter() {
+        return myAdapter;
     }
 
+    public void setArrayAdapter(ArrayAdapter<City> adapter) {
+        myAdapter = adapter;
+    }
+
+    public CustomAutoCompleteTextViewDB getMyAutoComplete() {
+        return myAutoComplete;
+    }
+
+    public void setMyAutoComplete(CustomAutoCompleteTextViewDB autoComplete) {
+        myAutoComplete = autoComplete;
+    }
+
+//    public void finder(View view) {
+//        citizen = city.getText().toString();
+//
+//        String uri = "http://www.openweathermap.org/data/2.5/weather?q=" + citizen;
+//
+//        new RequestTask().execute(uri);
+//        Intent it = new Intent(getActivity(), null);
+//        it.putExtra("name", citizen);
+//        startActivity(it);
+//
+//    }
+
+/*
     public class RequestTask extends AsyncTask<String, String, String> {
 
         @Override
@@ -101,7 +171,7 @@ public class SearchFragment extends Fragment {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     String msg = jsonObject.getString("message");
-                    if (msg.equalsIgnoreCase("Error: Not found city")) {
+                    if (msg.equalsIgnoreCase("Error: Not found name")) {
                         Log.e("TAG", "City not found");
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Delete entry")
@@ -116,7 +186,7 @@ public class SearchFragment extends Fragment {
                     } else {
                         // Use the data
                         Intent it = new Intent(getActivity(), null);
-                        it.putExtra("city", citizen);
+                        it.putExtra("name", citizen);
                         startActivity(it);
                     }
                 } catch (JSONException e) {
@@ -125,4 +195,6 @@ public class SearchFragment extends Fragment {
             }
         }
     }
+}
+*/
 }

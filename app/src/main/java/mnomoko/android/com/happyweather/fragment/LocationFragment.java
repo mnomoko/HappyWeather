@@ -96,7 +96,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 
         new RequestTask().execute(uri);
         //Intent it = new Intent(Malocation.this, Accueil.class);
-        //it.putExtra("city", add);
+        //it.putExtra("name", add);
         //startActivity(it);
 
     }

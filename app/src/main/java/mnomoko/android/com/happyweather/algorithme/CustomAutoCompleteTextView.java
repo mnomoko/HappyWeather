@@ -14,7 +14,7 @@ public class CustomAutoCompleteTextView extends AutoCompleteTextView {
 	
 	public CustomAutoCompleteTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-        this.setTextColor(Color.WHITE);
+        this.setTextColor(Color.BLACK);
 	}
 
 	/** Returns the place description corresponding to the selected item */

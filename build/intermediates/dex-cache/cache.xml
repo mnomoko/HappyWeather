@@ -2,32 +2,11 @@
 <items version="2" >
 
     <item
-        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/libs/commons-csv-1.1.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-a896d9cfc4e7f5348d783937967920325eba1ebe.jar" />
-    </item>
-    <item
-        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-42996a42753dd9b740377a4fcb8798f2ec440c5d.jar" />
-    </item>
-    <item
-        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-d357c2f7c91ef4b0248ec5e5240bc1e2fe318f49.jar" />
-    </item>
-    <item
-        jar="/home/mnomoko/android-sdks/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.0-3c2439ebdcbdfa55e002d3b6f2f4cefc1fba2bd7.jar" />
+        sha1="1eeeb118cab7ec49c9a10b478356eff108d5e87e">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/commons-csv-1.1-3ad0e8799cd6e53ef1180f7a8c3edbd19d277e6b.jar" />
     </item>
 
 </items>

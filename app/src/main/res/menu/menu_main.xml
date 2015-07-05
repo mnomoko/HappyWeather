@@ -4,5 +4,6 @@
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_websearch" android:icon="@drawable/action_search"
-        android:title="@string/action_websearch" app:showAsAction="ifRoom|withText"/>
+        android:title="@string/action_websearch" app:showAsAction="ifRoom|withText"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
 </menu>

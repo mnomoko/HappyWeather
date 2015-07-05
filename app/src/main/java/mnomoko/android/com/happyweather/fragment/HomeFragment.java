@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -27,14 +29,15 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
 import mnomoko.android.com.happyweather.adapters.DailyAdapter;
+import mnomoko.android.com.happyweather.algorithme.AutoResizeTextView;
 import mnomoko.android.com.happyweather.data.loader.DataLoader;
-import mnomoko.android.com.happyweather.data.loader.DownloadImageTask;
 import mnomoko.android.com.happyweather.model.Weather;
 
 /**
@@ -46,14 +49,19 @@ public class HomeFragment extends Fragment {
     FragmentManager fm;
     ImageView imgViewWeather;
     TextView tvNameDegres;
-    TextView tvNameCity;
+    AutoResizeTextView tvNameCity;
     TextView tvNameMinDegres;
     TextView tvNameMaxDegres;
     TextView tvNameHumidity;
     TextView tvNameWind;
     ListView lvDaily;
+    CheckBox checkbox;
+    Button btnChangeLinvingCity;
     View root;
     RelativeLayout layout;
+
+    String city;
+    String favorites;
 
     List<Weather> weathers;
 
@@ -63,12 +71,19 @@ public class HomeFragment extends Fragment {
         root = inflater.inflate(R.layout.home_fragment, container, false);
 
         layout = (RelativeLayout) root.findViewById(R.id.background);
-        //@TODO
-        //Show layout with widget
+
+        city = null;
+
+        sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
+        favorites = sharedpreferences.getString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
+
+//        SharedPreferences.Editor editor = sharedpreferences.edit();
+//        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
+//        editor.commit();
 
         fm = getChildFragmentManager();
         imgViewWeather = (ImageView) root.findViewById(R.id.imgViewWeather);
-        tvNameCity = (TextView) root.findViewById(R.id.tvNameCity);
+        tvNameCity = (AutoResizeTextView) root.findViewById(R.id.tvNameCity);
 //        /*int tvNameCityHeight = */tvNameCity.getLayoutParams().height *= 3;
 //        /*int tvNameCityWidth = */tvNameCity.getLayoutParams().width *= 3;
         tvNameDegres = (TextView) root.findViewById(R.id.tvNameDegrees);
@@ -78,16 +93,51 @@ public class HomeFragment extends Fragment {
         tvNameHumidity = (TextView) root.findViewById(R.id.tvNameHumidity);
         tvNameWind = (TextView) root.findViewById(R.id.tvNameWind);
 
+        checkbox = (CheckBox) root.findViewById(R.id.checkBox1);
+//        checkbox.setChecked(false);
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                if(checkbox.isChecked()) {
+
+                    favorites += city + ";";
+                    editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, favorites);
+                    editor.commit();
+                }
+                else {
+                    String temp = "";
+                    for(String s : favorites.split(";")) {
+
+                        if(!s.equals(city)) {
+                            temp += s + ";";
+                        }
+                        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, temp);
+                        editor.commit();
+                    }
+                }
+            }
+        });
+        btnChangeLinvingCity = (Button) root.findViewById(R.id.btnChangeLinvingCity);
+        btnChangeLinvingCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
+                alertdFragment.show(fm, getResources().getString(R.string.favorite));
+            }
+        });
+
         lvDaily = (ListView) root.findViewById(R.id.lvDaily);
         weathers = new ArrayList<Weather>();
 
-        sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
+//        sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
         String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
 
         Log.e("SharedPreferences", sharedpreferences.getAll().toString());
 
         if(favo == null) {
-            //show a dialog which add a city in favo
+            //show a dialog which add a name in favo
             AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
 //            Log.e("HomeFragment.class", fm.toString());
             alertdFragment.show(fm, getResources().getString(R.string.favorite));
@@ -103,20 +153,20 @@ public class HomeFragment extends Fragment {
     public class LaunchRequest extends AsyncTask<String, String, String> {
 
         /** application context. */
-        private Context context;
+        private Context _context;
 
         private ProgressDialog dialog;
         private DrawerActivity activity;
         public LaunchRequest(DrawerActivity activity) {
             this.activity = activity;
-            context = activity;
-            dialog = new ProgressDialog(context);
+            _context = activity;
+            dialog = new ProgressDialog(_context);
         }
 
         @Override
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
-            this.dialog.show();
+//            this.dialog.show();
         }
 
         @Override
@@ -138,6 +188,23 @@ public class HomeFragment extends Fragment {
                 JSONArray list = object.getJSONArray("list");
                 JSONObject first = list.getJSONObject(0);
 
+                city = name + "," + object.getJSONObject("city").getString("country");
+                Log.e("HomeFragment", "favorites = "+favorites);
+                if(favorites != null) {
+                    List<String> array = Arrays.asList(favorites.split(";"));
+                    for(String a : array) {
+                        Log.e("HomeFragment", "fav = "+a);
+                        if (a.equals(city)){
+                            checkbox.setChecked(true);
+                        }
+                        else {
+                            checkbox.setChecked(false);
+                        }
+                    }
+//                    if(favorites != "") {
+//                    }
+                }
+
                 String temp = first.getJSONObject("temp").getString("day");
                 String tempMin = first.getJSONObject("temp").getString("min");
                 String tempMax = first.getJSONObject("temp").getString("max");
@@ -147,9 +214,10 @@ public class HomeFragment extends Fragment {
 
                 String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
                 String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
-                new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
+                //new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
+                imgViewWeather.setImageResource(_context.getResources().getIdentifier("_"+icon, "drawable", _context.getPackageName()));
 
-                tvNameCity.setText(name);
+                tvNameCity.setText(city, TextView.BufferType.NORMAL);
                 tvNameDegres.setText(temp + " C°");
                 tvNameMinDegres.setText("min : " + tempMin + " C°");
                 tvNameMaxDegres.setText("max : " + tempMax + " C°");
@@ -189,6 +257,7 @@ public class HomeFragment extends Fragment {
 
 //                layout.setBackground(HomeFragment.getDrawable(getActivity(), R.drawable.sun));
                 HomeFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
+                lvDaily.invalidate();
 
                 if (dialog.isShowing()) {
                     dialog.dismiss();
@@ -230,13 +299,14 @@ public class HomeFragment extends Fragment {
             String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
 
             if(favo == null) {
-                //show a dialog which add a city in favo
+                //show a dialog which add a name in favo
                 AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
 //            Log.e("HomeFragment.class", fm.toString());
                 alertdFragment.show(fm, getResources().getString(R.string.favorite));
             }
             else {
                 new LaunchRequest((DrawerActivity)getActivity()).execute(favo);
+                weathers = new ArrayList<>();
             }
 
         }

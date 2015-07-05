@@ -137,13 +137,13 @@ public class AddFavoriteFragment extends DialogFragment {
 
     public void run(){
 
-        //ville  = city.getText().toString();
+        //ville  = name.getText().toString();
 
-//        CustomAutoCompleteTextView city = (CustomAutoCompleteTextView) root.findViewById(R.id.atv_places_add_fav);
+//        CustomAutoCompleteTextView name = (CustomAutoCompleteTextView) root.findViewById(R.id.atv_places_add_fav);
 
-        //Toast.makeText(SearchCityWeather.this, city.getText().toString(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(SearchCityWeather.this, name.getText().toString(), Toast.LENGTH_LONG).show();
         String villeEtPays = atvPlacesFav.getText().toString();
-//        String villeEtPays = city.getText().toString();
+//        String villeEtPays = name.getText().toString();
         String [] vrac = villeEtPays.split(",");
         String vill = vrac[0];
         String pays = vrac[1];
@@ -201,7 +201,7 @@ public class AddFavoriteFragment extends DialogFragment {
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-                    if (jsonObject.has("coord") ) {
+                    if (jsonObject.getInt("cod") == 200 ) {
 //                    if (jsonObject.has("message") && !jsonObject.isNull("message")) {
                         // Use the data
 //                        if(sharedpreferences == null) {
@@ -212,7 +212,7 @@ public class AddFavoriteFragment extends DialogFragment {
 
                         editor.commit();
 //                        Intent it = new Intent(AddFavoriteCity.this, Accueil.class);
-//                        it.putExtra("city", sharedpreferences.getString(City, ""));
+//                        it.putExtra("name", sharedpreferences.getString(City, ""));
 //                        startActivity(it);
                     }
                     else {

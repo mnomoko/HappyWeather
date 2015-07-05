@@ -19,13 +19,11 @@
         <item>@string/search_city</item>
     </string-array>
 
-
     <string name="icon">weathear_icon</string>
     <string name="city">City</string>
     <string name="degrees">Degrés</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>
-
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -35,4 +33,11 @@
     <string name="find">Lancer la recherche</string>
     <string name="addCity">Ajouter une ville</string>
     <string name="save">Enregistrer</string>
+    <string name="change_living_city">Changer de ville</string>
+    <string name="previous">précédent</string>
+    <string name="next">suivant</string>
+    <string name="search_hint">Recherche</string>
+
+    <string name="action_search">Search</string>
+    <string name="search_settings">Search Places</string>
 </resources>

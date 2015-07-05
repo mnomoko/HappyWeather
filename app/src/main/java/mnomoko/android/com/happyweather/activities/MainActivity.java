@@ -1,10 +1,10 @@
-package mnomoko.android.com.happyweather;
+package mnomoko.android.com.happyweather.activities;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import mnomoko.android.com.happyweather.activities.DrawerActivity;
+import mnomoko.android.com.happyweather.R;
 
 public class MainActivity extends DrawerActivity {
 

@@ -3,6 +3,7 @@ package mnomoko.android.com.happyweather.data.loader;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Calendar;
+
+import mnomoko.android.com.happyweather.activities.DrawerActivity;
 
 /**
  * Created by mnomoko on 28/06/15.
@@ -38,6 +42,25 @@ public class DataLoader {
 
         try {
 
+            File f = new File(city);
+            if(f.exists() && !f.isDirectory()) {
+
+                String cache = DrawerActivity.readCacheFile(city);
+                String[] array = cache.split("----------");
+                long timestamp = Long.parseLong(array[0]);
+                String value = array[1];
+
+                Calendar calendar = Calendar.getInstance();
+                java.util.Date now = calendar.getTime();
+                java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+
+                if(timestamp < currentTimestamp.getTime() - 600) {
+                    if (value != null)
+                        return value;
+                }
+
+            }
+
             String request = daily + city + dailyExtend;
 //            String request = text + city + extend;
             URL url = new URL(request);
@@ -57,6 +80,17 @@ public class DataLoader {
                 }
                 Log.e("JSONObject", response);
             }
+
+
+            long t = System.currentTimeMillis();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(t);
+            stringBuilder.append("----------");
+            stringBuilder.append(response);
+
+            DrawerActivity.writeCacheFile(city, stringBuilder.toString());
+
+
 
         }
         catch (MalformedURLException m) {
