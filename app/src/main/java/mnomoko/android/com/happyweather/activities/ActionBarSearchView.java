@@ -41,9 +41,9 @@ public class ActionBarSearchView extends Activity implements SearchView.OnQueryT
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_websearch);
-        mSearchView = (SearchView) searchItem.getActionView();
-        setupSearchView(searchItem);
+//        MenuItem searchItem = menu.findItem(R.id.action_websearch);
+//        mSearchView = (SearchView) searchItem.getActionView();
+//        setupSearchView(searchItem);
 
         return true;
     }

@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/background">
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/choose_city"
-        android:textSize="20dp"
-        android:layout_above="@+id/myautocomplete"/>
-    <!--<TextView-->
+    <LinearLayout
+        android:id="@+id/result_container"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/search_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_city"
+            android:textSize="20dp"
+            android:layout_above="@+id/myautocomplete"/>
+        <!--<TextView-->
         <!--android:id="@+id/editTextCitySearch"-->
         <!--android:layout_width="fill_parent"-->
         <!--android:layout_height="wrap_content"-->
@@ -17,20 +33,22 @@
         <!--android:layout_above="@+id/myautocomplete"-->
         <!--android:layout_gravity="center"-->
         <!--android:inputType="text" />-->
-    <mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB
-        android:id="@+id/myautocomplete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:completionThreshold="1"
-        android:layout_centerInParent="true" />
-    <Button
-        android:text="@string/find"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_below="@+id/myautocomplete"
-        android:onClick="finder" />
+        <mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB
+            android:id="@+id/myautocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:completionThreshold="1"
+            android:layout_centerInParent="true" />
+        <Button
+            android:text="@string/find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/myautocomplete"
+            android:onClick="finder" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

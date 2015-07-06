@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -27,8 +28,10 @@ import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 public class SplashScreen extends Activity {
 
     private static String CITIES_FILE = "cities_file.txt";
-    private static int SPLASH_TIME_OUT = 6000;
+    private static int SPLASH_TIME_OUT = 1000;
     List<String> content = null;
+
+    RelativeLayout layout;
 
     String now_playing, earned;
 
@@ -38,6 +41,9 @@ public class SplashScreen extends Activity {
         setContentView(R.layout.activity_splash);
 //        getLayoutInflater().inflate(R.layout.activity_splash, frameLayout);
 
+        layout = (RelativeLayout) findViewById(R.id.background);
+
+        DrawerActivity.setBackgroundView(layout, this, R.drawable.sun);
 
         //check if data is already download and when, if it been too far in the pass or if there are nothing download
         //so the splash screen will appear and data will be load

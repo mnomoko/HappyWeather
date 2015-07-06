@@ -23,13 +23,14 @@
         style="?android:attr/starStyle">
     </CheckBox>
 
-    <TextView
+    <mnomoko.android.com.happyweather.algorithme.AutoResizeTextView
         android:id="@+id/tvNameCity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center"
         android:ellipsize="none"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:textSize="100sp"/>
 
     <LinearLayout
         android:id="@+id/llNow"

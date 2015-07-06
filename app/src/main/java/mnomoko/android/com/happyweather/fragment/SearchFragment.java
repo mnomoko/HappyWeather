@@ -1,5 +1,6 @@
 package mnomoko.android.com.happyweather.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,10 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mnomoko.android.com.happyweather.R;
@@ -34,6 +37,14 @@ public class SearchFragment extends Fragment {
     CustomAutoCompleteTextViewDB myAutoComplete;
     ArrayAdapter<City> myAdapter;
 
+    View root;
+
+    RelativeLayout searchLayout;
+    LinearLayout resultLayout;
+    RelativeLayout layout;
+
+    ResultFragment resultFragment = null;
+
 //    TextView tvWriteText;
 
     @Nullable
@@ -41,11 +52,20 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        setContentView(R.layout.search_weather);
 
-        View root = inflater.inflate(R.layout.search_fragment, null);
+        root = inflater.inflate(R.layout.search_fragment, container, false);
+
+        layout = (RelativeLayout) root.findViewById(R.id.background);
+
+        DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+
+//        resultFragment=new ResultFragment();
 
 //        ViewGroup parent = (ViewGroup) root.findViewById(R.id.container);
 
 //        city = (EditText) root.findViewById(R.id.editTextCitySearch);
+
+        resultLayout = (LinearLayout) root.findViewById(R.id.result_container);
+        searchLayout = (RelativeLayout) root.findViewById(R.id.search_container);
 
         try{
 
@@ -70,12 +90,36 @@ public class SearchFragment extends Fragment {
                     String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
 
                     Bundle bundle=new Bundle();
-                    bundle.putString("city", "city");
+                    bundle.putString("city", city);
+
+                    if(resultFragment == null) {
+                        resultFragment = new ResultFragment();
+                    }
+                    else {
+                        getChildFragmentManager().beginTransaction().remove(resultFragment).commit();
+                        resultFragment = new ResultFragment();
+                    }
                     //set Fragmentclass Arguments
-                    ResultFragment resultFragment=new ResultFragment();
                     resultFragment.setArguments(bundle);
 
-                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
+
+
+                    getChildFragmentManager().beginTransaction().add(R.id.result_container, resultFragment).commit();
+
+
+//                    resultFragment.changeCity(city);
+
+                    resultLayout.setVisibility(View.VISIBLE);
+                    searchLayout.setVisibility(View.GONE);
+
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                                Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+
+//                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
                     getChildFragmentManager().executePendingTransactions();
 
                     Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
@@ -104,6 +148,8 @@ public class SearchFragment extends Fragment {
         return root;
     }
 
+
+
     public ArrayAdapter<City> getArrayAdapter() {
         return myAdapter;
     }
@@ -118,6 +164,19 @@ public class SearchFragment extends Fragment {
 
     public void setMyAutoComplete(CustomAutoCompleteTextViewDB autoComplete) {
         myAutoComplete = autoComplete;
+    }
+
+    public void showSearchFragment() {
+        resultLayout.setVisibility(View.GONE);
+        searchLayout.setVisibility(View.VISIBLE);
+        myAutoComplete.setText("");
+
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
 //    public void finder(View view) {

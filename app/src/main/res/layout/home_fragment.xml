@@ -86,7 +86,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:checked="false"
-        android:layout_margin="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
         style="?android:attr/starStyle">
     </CheckBox>
 

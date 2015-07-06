@@ -1,12 +1,9 @@
 package mnomoko.android.com.happyweather.fragment;
 
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -66,13 +63,15 @@ public class ResultFragment extends Fragment {
 
     List<Weather> weathers;
 
+    boolean first = true;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         String bundleCity =getArguments().getString("city");
 
-        View root = inflater.inflate(R.layout.home_fragment, null);
+        View root = inflater.inflate(R.layout.home_fragment, container, false);
 
         layout = (RelativeLayout) root.findViewById(R.id.background);
 
@@ -127,8 +126,8 @@ public class ResultFragment extends Fragment {
         btnChangeLinvingCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
-                alertdFragment.show(fm, getResources().getString(R.string.favorite));
+//                (ResultFragment.this).onDetach();
+                ((DrawerActivity)getActivity()).showSearchFragment();
             }
         });
 
@@ -144,6 +143,27 @@ public class ResultFragment extends Fragment {
 
         return root;
     }
+
+//    public void changeCity(String c) {
+//
+//        if(!first) {
+//            city = c;
+//            resetField();
+//            new LaunchRequest((DrawerActivity) getActivity()).execute(city);
+//
+//            first = false;
+//        }
+//    }
+//
+//    public void resetField() {
+//
+//        tvNameCity.invalidate();
+//        tvNameDegres.invalidate();
+//        tvNameMinDegres.invalidate();
+//        tvNameMaxDegres.invalidate();
+//        tvNameHumidity.invalidate();
+//        tvNameWind.invalidate();
+//    }
 
     public class LaunchRequest extends AsyncTask<String, String, String> {
 
@@ -175,49 +195,60 @@ public class ResultFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
 
-            try {
-                JSONObject object = new JSONObject(s);
+            final String json = s;
+            /**
+             * Update list ui after process finished.
+             */
+                //TODO update list ui here, use
+                activity.runOnUiThread(new Runnable() {
+                    public void run() {
+                        /**
+                         * Updating parsed JSON data into ListView
+                         */
 
-                String name = object.getJSONObject("city").getString("name");
+                        try {
+                            JSONObject object = new JSONObject(json);
 
-                JSONArray list = object.getJSONArray("list");
-                JSONObject first = list.getJSONObject(0);
+                            String name = object.getJSONObject("city").getString("name");
 
-                city = name + "," + object.getJSONObject("city").getString("country");
-                Log.e("HomeFragment", "favorites = "+favorites);
-                if(favorites != null) {
-                    List<String> array = Arrays.asList(favorites.split(";"));
-                    for(String a : array) {
-                        Log.e("HomeFragment", "fav = "+a);
-                        if (a.equals(city)){
-                            checkbox.setChecked(true);
-                        }
-                        else {
-                            checkbox.setChecked(false);
-                        }
-                    }
+                            JSONArray list = object.getJSONArray("list");
+                            JSONObject first = list.getJSONObject(0);
+
+                            city = name + "," + object.getJSONObject("city").getString("country");
+                            Log.e("HomeFragment", "favorites = "+favorites);
+                            if(favorites != null) {
+                                List<String> array = Arrays.asList(favorites.split(";"));
+                                for(String a : array) {
+                                    Log.e("HomeFragment", "fav = "+a);
+                                    if (a.equals(city)){
+                                        checkbox.setChecked(true);
+                                    }
+                                    else {
+                                        checkbox.setChecked(false);
+                                    }
+                                }
 //                    if(favorites != "") {
 //                    }
-                }
+                            }
 
-                String temp = first.getJSONObject("temp").getString("day");
-                String tempMin = first.getJSONObject("temp").getString("min");
-                String tempMax = first.getJSONObject("temp").getString("max");
-                String pressure = first.getString("pressure");
-                String wind = first.getString("speed");
-                String humidity = first.getString("humidity");
+                            String temp = first.getJSONObject("temp").getString("day");
+                            String tempMin = first.getJSONObject("temp").getString("min");
+                            String tempMax = first.getJSONObject("temp").getString("max");
+                            String pressure = first.getString("pressure");
+                            String wind = first.getString("speed");
+                            String humidity = first.getString("humidity");
 
-                String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
-                String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
-                //new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
-                imgViewWeather.setImageResource(_context.getResources().getIdentifier("_"+icon, "drawable", _context.getPackageName()));
+                            String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
+                            String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
+                            //new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
+                            imgViewWeather.setImageResource(_context.getResources().getIdentifier("_"+icon, "drawable", _context.getPackageName()));
 
-                tvNameCity.setText(city, TextView.BufferType.NORMAL);
-                tvNameDegres.setText(temp + " C°");
-                tvNameMinDegres.setText("min : " + tempMin + " C°");
-                tvNameMaxDegres.setText("max : " + tempMax + " C°");
-                tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
-                tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
+                            tvNameCity.setText(city, TextView.BufferType.NORMAL);
+                            tvNameDegres.setText(temp + " C°");
+                            tvNameMinDegres.setText("min : " + tempMin + " C°");
+                            tvNameMaxDegres.setText("max : " + tempMax + " C°");
+                            tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
+                            tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
 
 //                String name = object.getString("name");
 //                tvNameCity.setText(name);
@@ -226,62 +257,48 @@ public class ResultFragment extends Fragment {
 //                String humidity = object.getJSONObject("main").getString("humidity");
 //                String wind = object.getJSONObject("wind").getString("speed");
 
-                SimpleDateFormat sdf = new SimpleDateFormat("EEEE d");
+                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE d");
 
-                for(int i = 1; i < list.length(); i++) {
-                    JSONObject json = list.getJSONObject(i);
+                            for(int i = 1; i < list.length(); i++) {
+                                JSONObject json = list.getJSONObject(i);
 
-                    String lvIcon = json.getJSONArray("weather").getJSONObject(0).getString("icon");
-                    String lvCity = name;
-                    String lvTempMin = json.getJSONObject("temp").getString("min");
-                    String lvTempMax = json.getJSONObject("temp").getString("max");
+                                String lvIcon = json.getJSONArray("weather").getJSONObject(0).getString("icon");
+                                String lvCity = name;
+                                String lvTempMin = json.getJSONObject("temp").getString("min");
+                                String lvTempMax = json.getJSONObject("temp").getString("max");
 
-                    long timestamp = json.getLong("dt") * 1000L;
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(timestamp);
-                    String lvDate = sdf.format(cal.getTime());
+                                long timestamp = json.getLong("dt") * 1000L;
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTimeInMillis(timestamp);
+                                String lvDate = sdf.format(cal.getTime());
 
-                    weathers.add(new Weather(lvIcon, lvCity, Double.valueOf(lvTempMin).intValue(),
-                            Double.valueOf(lvTempMax).intValue(), lvDate));
-                }
-                lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
+                                weathers.add(new Weather(lvIcon, lvCity, Double.valueOf(lvTempMin).intValue(),
+                                        Double.valueOf(lvTempMax).intValue(), lvDate));
+                            }
+                            lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
 
 //                WallpaperManager myWallpaperManager
 //                        = WallpaperManager.getInstance(getActivity().getApplicationContext());
 //                    myWallpaperManager.setResource(R.drawable.sun);
 
 //                layout.setBackground(HomeFragment.getDrawable(getActivity(), R.drawable.sun));
-                HomeFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
-                lvDaily.invalidate();
+                            DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+                            lvDaily.invalidate();
 
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-            }
-            catch (JSONException e) {
-                Log.e(getActivity().getLocalClassName(), "_"+e.getMessage());
-            }
+                            if (dialog.isShowing()) {
+                                dialog.dismiss();
+                            }
+                        }
+                        catch (JSONException e) {
+                            Log.e(getActivity().getLocalClassName(), "_"+e.getMessage());
+                        }
+
+                    }
+                });
+
+
 
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static Drawable getDrawable(Context context, int resource) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return context.getResources().getDrawable(resource, null);
-        }
-
-        return context.getResources().getDrawable(resource);
-    }
-
-    public static void setBackgroundView(RelativeLayout layout, Context context, int drawable) {
-
-        if (Build.VERSION.SDK_INT >= 16) {
-            layout.setBackground(HomeFragment.getDrawable(context, drawable));
-        }else{
-            layout.setBackgroundDrawable(HomeFragment.getDrawable(context, drawable));
-        }
-
     }
 
     private class YourDialogFragmentDismissHandler extends Handler {

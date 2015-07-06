@@ -3,16 +3,23 @@ package mnomoko.android.com.happyweather.activities;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 
 import mnomoko.android.com.happyweather.R;
 
 public class MainActivity extends DrawerActivity {
+
+    RelativeLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
         getLayoutInflater().inflate(R.layout.activity_main, frameLayout);
+
+        layout = (RelativeLayout) findViewById(R.id.background);
+
+        DrawerActivity.setBackgroundView(layout, this, R.drawable.sun);
 
     }
 

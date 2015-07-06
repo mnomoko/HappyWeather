@@ -48,7 +48,6 @@ public class LocationFragment extends Fragment implements LocationListener {
     private TextView condDescr;
     private TextView temp;
     ImageView imgIcon;
-    private static String MY_URL_STRING = "http://openweathermap.org/img/w/";
 
     public String weatherXML = null;
 

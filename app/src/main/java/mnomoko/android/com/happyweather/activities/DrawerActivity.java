@@ -1,12 +1,13 @@
 package mnomoko.android.com.happyweather.activities;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,7 +27,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -196,28 +199,6 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
-//        searchAction = menu.add(0, SEARCH_ACTION_ID, 0 , getString(R.string.action_search));
-//        searchAction.setShowAsAction(SHOW_AS_ACTION_ALWAYS | SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-//        searchView = new CustomSearchView(getBaseContext());
-//        searchView.setOnQueryTextListener(searchQueryListener);
-//        searchView.setIconifiedByDefault(true);
-//        searchAction.setActionView(searchView);
-
-//        /*final SearchView */searchView = (SearchView) menu.findItem(R.id.action_websearch).getActionView();
-//        final SearchManager manager = (SearchManager) getSystemService(SEARCH_SERVICE);
-//        searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
-//        searchView.setOnQueryTextListener(this);
-//
-//        final int resource_edit_text = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        ((EditText) searchView.findViewById(resource_edit_text)).addTextChangedListener(this);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView =
-//                (SearchView) menu.findItem(R.id.action_websearch).getActionView();
-//        searchView.setSearchableInfo(
-//                searchManager.getSearchableInfo(getComponentName()));
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -226,7 +207,6 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -243,17 +223,10 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         }
         // Handle action buttons
         switch(item.getItemId()) {
-            case R.id.action_websearch:
-                searchView.setIconified(false);
-                // create intent to perform web search for this planet
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, getSupportActionBar().getTitle());
-                // catch event that there's no activity to handle intent
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
-                }
+            case R.id.action_location:
+
+
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -278,6 +251,10 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     @Override
     public void onCancelled() {
 
+    }
+
+    public void showSearchFragment() {
+        searchFragment.showSearchFragment();
     }
 
     /* The click listner for ListView in the navigation drawer */
@@ -360,6 +337,35 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static Drawable getDrawable(Context context, int resource) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return context.getResources().getDrawable(resource, null);
+        }
+
+        return context.getResources().getDrawable(resource);
+    }
+
+    public static void setBackgroundView(RelativeLayout layout, Context context, int drawable) {
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            layout.setBackground(DrawerActivity.getDrawable(context, drawable));
+        }else{
+            layout.setBackgroundDrawable(DrawerActivity.getDrawable(context, drawable));
+        }
+
+    }
+
+    public static void setBackgroundView(LinearLayout layout, Context context, int drawable) {
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            layout.setBackground(DrawerActivity.getDrawable(context, drawable));
+        }else{
+            layout.setBackgroundDrawable(DrawerActivity.getDrawable(context, drawable));
+        }
+
     }
 
     public String dateFromUnix(long unix) {

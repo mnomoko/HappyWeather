@@ -65,7 +65,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     ImageView imgViewWeather;
     TextView tvNameDegres;
     TextView tvNameCity;
-//    AutoResizeTextView tvNameCity;
+    //    AutoResizeTextView tvNameCity;
     TextView tvNameMinDegres;
     TextView tvNameMaxDegres;
     TextView tvNameHumidity;
@@ -234,72 +234,83 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         @Override
         protected void onPostExecute(String s) {
 
-            try {
-                JSONObject object = new JSONObject(s);
 
-                String name = object.getJSONObject("city").getString("name");
+            final String json = s;
+            /**
+             * Update list ui after process finished.
+             */
+            //TODO update list ui here, use
+            activity.runOnUiThread(new Runnable() {
+                public void run() {
+                    /**
+                     * Updating parsed JSON data into ListView
+                     */
 
-                JSONArray list = object.getJSONArray("list");
-                JSONObject first = list.getJSONObject(0);
+                    try {
+                        JSONObject object = new JSONObject(json);
 
-                city = name + "," + object.getJSONObject("city").getString("country");
-                Log.e("HomeFragment", "+"+favorites);
+                        String name = object.getJSONObject("city").getString("name");
 
-                LayoutInflater inflater = (LayoutInflater) getActivity()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.favorite_fragment_item, null);
+                        JSONArray list = object.getJSONArray("list");
+                        JSONObject first = list.getJSONObject(0);
 
-                layout = (LinearLayout) view.findViewById(R.id.background);
+                        city = name + "," + object.getJSONObject("city").getString("country");
+                        Log.e("HomeFragment", "+" + favorites);
+
+                        LayoutInflater inflater = (LayoutInflater) getActivity()
+                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = inflater.inflate(R.layout.favorite_fragment_item, null);
+
+                        layout = (LinearLayout) view.findViewById(R.id.background);
 //                layoutSubView = (LinearLayout) view.findViewById(R.id.background);
 
 //                layout = (RelativeLayout) view.findViewById(R.id.background);
 
-                List<Weather> weathers = new ArrayList<>();
+                        List<Weather> weathers = new ArrayList<>();
 
-                checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
-                checkbox.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                        checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
+                        checkbox.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
 
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        if(checkbox.isChecked()) {
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                if (checkbox.isChecked()) {
 
-                            favorites += city + ";";
-                            editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, favorites);
-                            editor.commit();
-                        }
-                        else {
-                            String temp = "";
-                            for(String s : favorites.split(";")) {
+                                    favorites += city + ";";
+                                    editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, favorites);
+                                    editor.commit();
+                                } else {
+                                    String temp = "";
+                                    for (String s : favorites.split(";")) {
 
-                                if(!s.equals(city)) {
-                                    temp += s + ";";
+                                        if (!s.equals(city)) {
+                                            temp += s + ";";
+                                        }
+                                        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, temp);
+                                        editor.commit();
+                                    }
                                 }
-                                editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, temp);
-                                editor.commit();
+                            }
+                        });
+                        if (favorites != null) {
+                            if (Arrays.asList(favorites.split(";")).contains(city)) {
+                                checkbox.setChecked(true);
                             }
                         }
-                    }
-                });
-                if(favorites != null) {
-                    if (Arrays.asList(favorites.split(";")).contains(city)) {
-                        checkbox.setChecked(true);
-                    }
-                }
 
-                imgViewWeather = (ImageView) view.findViewById(R.id.imgViewWeather);
+                        imgViewWeather = (ImageView) view.findViewById(R.id.imgViewWeather);
 //                tvNameCity = (AutoResizeTextView) view.findViewById(R.id.tvNameCity);
-                tvNameCity = (TextView) view.findViewById(R.id.tvNameCity);
-                tvNameDegres = (TextView) view.findViewById(R.id.tvNameDegrees);
-                tvNameDegres.setTextSize(tvNameDegres.getTextSize() * (3/2));
-                tvNameMinDegres = (TextView) view.findViewById(R.id.tvNameMinDegres);
-                tvNameMaxDegres = (TextView) view.findViewById(R.id.tvNameMaxDegres);
-                tvNameHumidity = (TextView) view.findViewById(R.id.tvNameHumidity);
-                tvNameWind = (TextView) view.findViewById(R.id.tvNameWind);
+                        tvNameCity = (TextView) view.findViewById(R.id.tvNameCity);
+                        tvNameDegres = (TextView) view.findViewById(R.id.tvNameDegrees);
+                        tvNameDegres.setTextSize(tvNameDegres.getTextSize() * (3 / 2));
+                        tvNameMinDegres = (TextView) view.findViewById(R.id.tvNameMinDegres);
+                        tvNameMaxDegres = (TextView) view.findViewById(R.id.tvNameMaxDegres);
+                        tvNameHumidity = (TextView) view.findViewById(R.id.tvNameHumidity);
+                        tvNameWind = (TextView) view.findViewById(R.id.tvNameWind);
 
-                lvDaily = (ListView) view.findViewById(R.id.lvDaily);
-                lvDaily.setOnTouchListener(new View.OnTouchListener(/*((FavoriteFragment.this).getActivity()), gestureListener*/) {
-//                    @Override
+                        lvDaily = (ListView) view.findViewById(R.id.lvDaily);
+                        lvDaily.setOnTouchListener(new View.OnTouchListener(/*((FavoriteFragment.this).getActivity()), gestureListener*/) {
+                            //                    @Override
 //                    public boolean onTouch(View view, MotionEvent motionEvent) {
 //                        switch ((motionEvent.getAction())) {
 //                            case MotionEvent.ACTION_DOWN:
@@ -315,89 +326,90 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 //                        return true;
 //                    }
 //                });
-                    int before = -1;
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        switch(event.getAction()) {
-                            case MotionEvent.AXIS_HSCROLL:
-                                detector.onTouchEvent(event);
-                                break;
-                            case MotionEvent.ACTION_DOWN:
-                                before = ((ListView) v).getFirstVisiblePosition();
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                int now = ((ListView) v).getFirstVisiblePosition();
+                            int before = -1;
+
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                switch (event.getAction()) {
+                                    case MotionEvent.AXIS_HSCROLL:
+                                        detector.onTouchEvent(event);
+                                        break;
+                                    case MotionEvent.ACTION_DOWN:
+                                        before = ((ListView) v).getFirstVisiblePosition();
+                                        break;
+                                    case MotionEvent.ACTION_UP:
+                                        int now = ((ListView) v).getFirstVisiblePosition();
 //                                if(now < before)
 //                                else if(now > before)
-                                break;
+                                        break;
 
-                        }
-                        return false;
-                    }
-                });
+                                }
+                                return false;
+                            }
+                        });
 
-                String temp = first.getJSONObject("temp").getString("day");
-                String tempMin = first.getJSONObject("temp").getString("min");
-                String tempMax = first.getJSONObject("temp").getString("max");
-                String pressure = first.getString("pressure");
-                String wind = first.getString("speed");
-                String humidity = first.getString("humidity");
+                        String temp = first.getJSONObject("temp").getString("day");
+                        String tempMin = first.getJSONObject("temp").getString("min");
+                        String tempMax = first.getJSONObject("temp").getString("max");
+                        String pressure = first.getString("pressure");
+                        String wind = first.getString("speed");
+                        String humidity = first.getString("humidity");
 
-                String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
-                String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
+                        String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
+                        String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
 //                new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
-                imgViewWeather.setImageResource(context.getResources().getIdentifier("_"+icon, "drawable", context.getPackageName()));
+                        imgViewWeather.setImageResource(context.getResources().getIdentifier("_" + icon, "drawable", context.getPackageName()));
 
-                tvNameCity.setText(name, TextView.BufferType.NORMAL);
-                int size = tvNameCity.getText().length();
-                if(size < 6) {
-                    tvNameCity.setTextSize(tvNameCity.getTextSize() * (5/3));
-                }
-                else if(size <13) {
-                    tvNameCity.setTextSize(tvNameCity.getTextSize() * (3/2));
-                }
-                tvNameDegres.setText(temp + " C°");
-                tvNameMinDegres.setText("min : " + tempMin + " C°");
-                tvNameMaxDegres.setText("max : " + tempMax + " C°");
-                tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
-                tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
+                        tvNameCity.setText(name, TextView.BufferType.NORMAL);
+                        int size = tvNameCity.getText().length();
+                        if (size < 6) {
+                            tvNameCity.setTextSize(tvNameCity.getTextSize() * (5 / 3));
+                        } else if (size < 13) {
+                            tvNameCity.setTextSize(tvNameCity.getTextSize() * (3 / 2));
+                        }
+                        tvNameDegres.setText(temp + " C°");
+                        tvNameMinDegres.setText("min : " + tempMin + " C°");
+                        tvNameMaxDegres.setText("max : " + tempMax + " C°");
+                        tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
+                        tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("EEEE d");
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEEE d");
 
-                for(int i = 1; i < list.length(); i++) {
-                    JSONObject json = list.getJSONObject(i);
+                        for (int i = 1; i < list.length(); i++) {
+                            JSONObject json = list.getJSONObject(i);
 
-                    String lvIcon = json.getJSONArray("weather").getJSONObject(0).getString("icon");
-                    String lvCity = name;
-                    String lvTempMin = json.getJSONObject("temp").getString("min");
-                    String lvTempMax = json.getJSONObject("temp").getString("max");
+                            String lvIcon = json.getJSONArray("weather").getJSONObject(0).getString("icon");
+                            String lvCity = name;
+                            String lvTempMin = json.getJSONObject("temp").getString("min");
+                            String lvTempMax = json.getJSONObject("temp").getString("max");
 
-                    long timestamp = json.getLong("dt") * 1000L;
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(timestamp);
-                    String lvDate = sdf.format(cal.getTime());
+                            long timestamp = json.getLong("dt") * 1000L;
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTimeInMillis(timestamp);
+                            String lvDate = sdf.format(cal.getTime());
 
-                    weathers.add(new Weather(lvIcon, lvCity, Double.valueOf(lvTempMin).intValue(),
-                            Double.valueOf(lvTempMax).intValue(), lvDate));
-                }
-                lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
-                FavoriteFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
+                            weathers.add(new Weather(lvIcon, lvCity, Double.valueOf(lvTempMin).intValue(),
+                                    Double.valueOf(lvTempMax).intValue(), lvDate));
+                        }
+                        lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
+                        FavoriteFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
 //                FavoriteFragment.setBackgroundView(bigLayout, getActivity(), R.drawable.sun);
 
 
 //                lvDaily.invalidate();
 
-                viewFlipper.addView(view);
-                circlePagerIndicator.setCurrentDisplayedChild(0);
+                        viewFlipper.addView(view);
+                        circlePagerIndicator.setCurrentDisplayedChild(0);
 
 
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                    } catch (JSONException e) {
+                        Log.e(getActivity().getLocalClassName(), "_" + e.getMessage());
+                    }
                 }
-            }
-            catch (JSONException e) {
-                Log.e(getActivity().getLocalClassName(), "_"+e.getMessage());
-            }
+            });
 
         }
     }
