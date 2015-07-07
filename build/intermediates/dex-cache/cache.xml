@@ -2,6 +2,55 @@
 <items version="2" >
 
     <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-appinvite/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="63ec6e9f4fe5482a7447d0f3091b8e543a02554c">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-6a5f12c493e5fec2d3d8f2d6a9e85092991c08d9.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-drive/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f44d03c138cb6488fdbaa65e3a7e5878861a56d8">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-5078c1eb2dc419f8b2f90a24517ea5a8adf96a2b.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/22.0.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a1372c17fccacca753d3951d3ad820571cbce075">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-118065c152e06e4cfad8c1f23d48724e3d7f83f2.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-analytics/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e7b35244f50663b3f8d150714bca9ecd7a290da1">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-fcd80a173626d7d63139a037a4c4eb87b23492e8.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1e98ef3f124bb7a11f8575f9ff5dfea330b61b6f">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-f745a5e2be1acc42f196e3330aae3cfdcabea27a.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-cast/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="8e3a972f28b8bae817e382257ba177a31bcadbbc">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-5ebe94f591bfb74f4ecdd6bcb95f1f76ffcc25ca.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-d357c2f7c91ef4b0248ec5e5240bc1e2fe318f49.jar" />
+    </item>
+    <item
         jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/libs/commons-csv-1.1.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -16,11 +65,11 @@
         <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-42996a42753dd9b740377a4fcb8798f2ec440c5d.jar" />
     </item>
     <item
-        jar="/home/mnomoko/android-sdks/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-identity/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.0-3c2439ebdcbdfa55e002d3b6f2f4cefc1fba2bd7.jar" />
+        sha1="d405025c600055237c171a0bbabaa49d69696573">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-313f55ff697e971d090d5d4f04110d2666584b45.jar" />
     </item>
     <item
         jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
@@ -30,11 +79,116 @@
         <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-a896d9cfc4e7f5348d783937967920325eba1ebe.jar" />
     </item>
     <item
-        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-gcm/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-d357c2f7c91ef4b0248ec5e5240bc1e2fe318f49.jar" />
+        sha1="8d736fefa22d896e84a268354b3ed48a42663150">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-2ce9c0c0106d73838c40a8808e7cbe8db0dd51b0.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="06a42becc33232ec0ee125161da68c1829c9f8fd">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-b74d1bf86dab00d17b486b388fc180fda956414e.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-games/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="02bac2dc792d78241077861566f2c82da955e7fa">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-7a45573e6787e0adbc147584a59e569bc5155ec0.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a78183f30e769a98ab4820794f597763088d3065">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-8735e030eff3ff333be2b4566d9d22ef80fee134.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-appindexing/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f02127a85abd52a2cd526d4c2409f21969f80ee8">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-4652ba1ef626449b6347a84849fc5f923d9d4a8c.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/22.0.0/jars/libs/internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="ba3df4eb0a630d7de294f0e48d3f9267d279b784">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/internal_impl-22.0.0-fd3591e0d2791538c5552bb3ba7ad5b61a61e99a.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6836d188602ec5382d1967c58b00960eb8ff8773">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-5ad95919fb834ece27336e382428e2ec6daa0f05.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/android-sdks/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.0-3c2439ebdcbdfa55e002d3b6f2f4cefc1fba2bd7.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-appstate/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="68c140702c7242d914655bcb3164d9e8c45b84cb">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-45d6d0a9636bc43592071b4c705d7dea1838d6a1.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-fitness/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a172852a35ff919e85b9b7f14bbc15c5bee25520">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-c9bd59c2475dbd55f6da52c006ee861da46bf443.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-panorama/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="ba207be21987c11b37d9f8faa08ed6e722569f30">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-4e2738591c1181e07fbb7dfbe45e7c2635885084.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="29ebc7e04d877062317c8cc0e68b20f0c1fcda66">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-c4c6bb0c3e707347f2c0602a155aab3fd26318b2.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-safetynet/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1a6411087ab88ce5542f593e63a2752b6b0d6f1a">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-7f90876fea3bdabf242aafb0212a6412b2e6bd5c.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-nearby/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6440e5e5cfe368f9bff3c537fb8988048069cb33">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-fffe6a03af6b0eeed4d48023b80fe1e58406ca84.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-plus/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="272bc5d7063f24bc3a33ea1d318cde8f31f5ec4c">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-a0887fbc51fe6f1ece20bb1f0e2af30fc5508b81.jar" />
+    </item>
+    <item
+        jar="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="69dd177337ead693c408c8dddc9546bb6f1244fa">
+        <dex dex="/home/mnomoko/AndroidStudioProjects/HappyWeather/app/build/intermediates/pre-dexed/debug/classes-bfb59313df7f05f1f10cf3bcfc9b526741144c4d.jar" />
     </item>
 
 </items>

@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
-import mnomoko.android.com.happyweather.adapters.AutocompleteDBCustomArrayAdapter;
 import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
 import mnomoko.android.com.happyweather.algorithme.CustomTextChangeListner;
 import mnomoko.android.com.happyweather.database.City;
@@ -129,12 +128,14 @@ public class SearchFragment extends Fragment {
 
             // add the listener so it will tries to suggest while the user types
             myAutoComplete.addTextChangedListener(new CustomTextChangeListner((DrawerActivity)getActivity()));
-
-            // ObjectItemData has no value at first
-            City[] ObjectItemData = new City[0];
-
-            // set the custom ArrayAdapter
-            myAdapter = new AutocompleteDBCustomArrayAdapter((DrawerActivity)getActivity(), ObjectItemData);
+//
+//            // ObjectItemData has no value at first
+//            City[] ObjectItemData = new City[0];
+//
+//            // set the custom ArrayAdapter
+//            myAdapter = new AutocompleteDBCustomArrayAdapter((DrawerActivity)getActivity(), ObjectItemData);
+            myAdapter = ((DrawerActivity) getActivity()).getArrayAdapter();
+            ((DrawerActivity) getActivity()).setMyAutoComplete(myAutoComplete);
             myAutoComplete.setAdapter(myAdapter);
 
         } catch (NullPointerException e) {

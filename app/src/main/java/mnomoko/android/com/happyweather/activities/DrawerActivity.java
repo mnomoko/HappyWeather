@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,27 +34,43 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import mnomoko.android.com.happyweather.R;
+import mnomoko.android.com.happyweather.adapters.AutocompleteDBCustomArrayAdapter;
 import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
 import mnomoko.android.com.happyweather.database.City;
 import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 import mnomoko.android.com.happyweather.fragment.FavoriteFragment;
 import mnomoko.android.com.happyweather.fragment.HomeFragment;
+import mnomoko.android.com.happyweather.fragment.LocationFragment;
 import mnomoko.android.com.happyweather.fragment.SearchFragment;
 import mnomoko.android.com.happyweather.fragment.parent.FragmentHanger;
 
 /**
  * Created by mnomoko on 28/06/15.
  */
-public class DrawerActivity extends AppCompatActivity implements FragmentHanger.TaskStatusCallback, SearchView.OnQueryTextListener, TextWatcher {
+public class DrawerActivity extends AppCompatActivity implements FragmentHanger.TaskStatusCallback, SearchView.OnQueryTextListener, TextWatcher,
+        LocationListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     public static final String APP_DATA = "Application_Happy_Weather";
     public static final String APP_DATA_LIVING_CITY = "Application_Happy_Weather_Living_City";
@@ -72,6 +90,9 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     private HomeFragment homeFragment;
     private FavoriteFragment favoriteFragment;
     private  SearchFragment searchFragment;
+    private LocationFragment locationFragment;
+
+    ArrayAdapter<City> myAdapter;
 
     ActionBar actionBar;
     private SearchView searchView;
@@ -86,12 +107,48 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 
     //FIN AUTOCUSTOM DB
 
+    private static final String TAG = "LocationActivity";
+
+    String longitude = null;
+    String latitude = null;
+
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+    Location mCurrentLocation;
+    String mLastUpdateTime;
+
+    private static final long INTERVAL = 1000 * 10;
+    private static final long FASTEST_INTERVAL = 1000 * 5;
+
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_main);
 
         context = getBaseContext();
+
+
+        if (!isGooglePlayServicesAvailable()) {
+//            finish();
+            Log.e("GooglePlayServices", "not available !");
+        }
+        createLocationRequest();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        // check if GPS enabled
+//        gpsTracker = new GPSTracker(this);
 
         if(savedInstanceState == null)
         {
@@ -110,6 +167,13 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         //FOR DB AUTOCOMPLETE
         // instantiate database handler
         databaseH = new MySqlLiteHelper(this);
+
+
+        // ObjectItemData has no value at first
+        City[] ObjectItemData = new City[0];
+
+        // set the custom ArrayAdapter
+        myAdapter = new AutocompleteDBCustomArrayAdapter(this, ObjectItemData);
 //
 //        actionBar = getSupportActionBar();
 //        actionBar.setDisplayHomeAsUpEnabled(true);
@@ -169,29 +233,39 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     }
 
     public ArrayAdapter<City> getArrayAdapter() {
-        if(searchFragment != null) {
-            return searchFragment.getArrayAdapter();
+//        if(searchFragment != null) {
+//            return searchFragment.getArrayAdapter();
+//        }
+//        return null;
+        if(myAdapter != null) {
+            return myAdapter;
         }
         return null;
     }
 
     public void setArrayAdapter(ArrayAdapter<City> adapter) {
-        if(searchFragment != null) {
-            searchFragment.setArrayAdapter(adapter);
-        }
+//        if(searchFragment != null) {
+//            searchFragment.setArrayAdapter(adapter);
+//        }
+        myAdapter = adapter;
     }
 
     public CustomAutoCompleteTextViewDB getMyAutoComplete() {
-        if(searchFragment != null) {
-            return searchFragment.getMyAutoComplete();
+//        if(searchFragment != null) {
+//            return searchFragment.getMyAutoComplete();
+//        }
+//        return null;
+        if(myAutoComplete != null) {
+            return myAutoComplete;
         }
         return null;
     }
 
     public void setMyAutoComplete(CustomAutoCompleteTextViewDB myAutoComplete) {
-        if(searchFragment != null) {
-            searchFragment.setMyAutoComplete(myAutoComplete);
-        }
+//        if(searchFragment != null) {
+//            searchFragment.setMyAutoComplete(myAutoComplete);
+//        }
+        this.myAutoComplete = myAutoComplete;
     }
 
     @Override
@@ -225,7 +299,72 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         switch(item.getItemId()) {
             case R.id.action_location:
 
+                ////show error dialog if GoolglePlayServices not available
+//                if (!isGooglePlayServicesAvailable()) {
+//                    finish();
+//                }
+//                createLocationRequest();
+//                mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                        .addApi(LocationServices.API)
+//                        .addConnectionCallbacks(this)
+//                        .addOnConnectionFailedListener(this)
+//                        .build();
 
+                updateUI();
+
+//                Bundle bundle = new Bundle();
+//                bundle.putString("latitude", ""+latitude);
+//                bundle.putString("longitude", ""+longitude);
+//                if(locationFragment == null) {
+                    LocationFragment locationFragment = new LocationFragment(longitude, latitude);
+//            Log.e("HomeFragment.class", fm.toString());
+                    locationFragment.show(getSupportFragmentManager(), getResources().getString(R.string.favorite));
+//                    locationFragment = new LocationFragment();
+//                    locationFragment.setArguments(bundle);
+
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, locationFragment).commit();
+//                }
+//                else {
+//                    getSupportFragmentManager().beginTransaction().detach(locationFragment).commit();
+//                    locationFragment = new LocationFragment();
+//                    locationFragment.setArguments(bundle);
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, locationFragment).commit();
+//                }
+
+
+//                if (providerLocationTracker.gpsIsEnable())
+//                {
+//
+//                    Location location = fallbackLocationTracker.getLocation();
+//                    Log.e("DrawerActivity", "location = " + location);
+//                    double lat = location.getLatitude();
+//                    double lon = location.getLongitude();
+//
+//                    Log.e("DrawerActivity", "lon = " + lon + " && lat = " + lat);
+//
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("latitude", ""+lat);
+//                    bundle.putString("longitude", ""+lon);
+//                    if(locationFragment == null) {
+//                        locationFragment = new LocationFragment();
+//                        locationFragment.setArguments(bundle);
+//
+//                        getSupportFragmentManager().beginTransaction().add(R.id.container, locationFragment).commit();
+//                    }
+//                    else {
+//                        getSupportFragmentManager().beginTransaction().detach(locationFragment).commit();
+//                        locationFragment = new LocationFragment();
+//                        locationFragment.setArguments(bundle);
+//                        getSupportFragmentManager().beginTransaction().add(R.id.container, locationFragment).commit();
+//                    }
+//                }
+//                else
+//                {
+//                    // can't get location
+//                    // GPS or Network is not enabled
+//                    // Ask user to enable GPS/network in settings
+//                    providerLocationTracker.showSettingsAlert(this);
+//                }
 
                 return true;
             default:
@@ -255,6 +394,80 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 
     public void showSearchFragment() {
         searchFragment.showSearchFragment();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart fired ..............");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop fired ..............");
+        mGoogleApiClient.disconnect();
+        Log.d(TAG, "isConnected ...............: " + mGoogleApiClient.isConnected());
+    }
+
+    private boolean isGooglePlayServicesAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (ConnectionResult.SUCCESS == status) {
+            return true;
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+            return false;
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
+        startLocationUpdates();
+    }
+
+    protected void startLocationUpdates() {
+        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        Log.d(TAG, "Location update started ..............: ");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "Connection failed: " + connectionResult.toString());
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "Firing onLocationChanged..............................................");
+        mCurrentLocation = location;
+        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+//        updateUI();
+    }
+
+    private void updateUI() {
+        Log.d(TAG, "UI update initiated .............");
+        if (null != mCurrentLocation) {
+            String lat = String.valueOf(mCurrentLocation.getLatitude());
+            String lng = String.valueOf(mCurrentLocation.getLongitude());
+
+            longitude = lng;
+            latitude = lat;
+
+//            tvLocation.setText("At Time: " + mLastUpdateTime + "\n" +
+//                    "Latitude: " + lat + "\n" +
+//                    "Longitude: " + lng + "\n" +
+//                    "Accuracy: " + mCurrentLocation.getAccuracy() + "\n" +
+//                    "Provider: " + mCurrentLocation.getProvider());
+        } else {
+            Log.d(TAG, "location is null ...............");
+        }
     }
 
     /* The click listner for ListView in the navigation drawer */

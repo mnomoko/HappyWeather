@@ -3,6 +3,7 @@ package mnomoko.android.com.happyweather.fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -91,6 +92,7 @@ public class HomeFragment extends Fragment {
         tvNameWind = (TextView) root.findViewById(R.id.tvNameWind);
 
         checkbox = (CheckBox) root.findViewById(R.id.checkBox1);
+        checkbox.setHighlightColor(Color.BLACK);
 //        checkbox.setChecked(false);
         checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +100,7 @@ public class HomeFragment extends Fragment {
 
                 SharedPreferences.Editor editor = sharedpreferences.edit();
                 if(checkbox.isChecked()) {
-
+                    checkbox.setHighlightColor(Color.YELLOW);
                     favorites += city + ";";
                     editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, favorites);
                     editor.commit();
@@ -204,6 +206,7 @@ public class HomeFragment extends Fragment {
                                 Log.e("HomeFragment", "fav = "+a);
                                 if (a.equals(city)){
                                     checkbox.setChecked(true);
+                                    checkbox.setHighlightColor(Color.YELLOW);
                                 }
                                 else {
                                     checkbox.setChecked(false);

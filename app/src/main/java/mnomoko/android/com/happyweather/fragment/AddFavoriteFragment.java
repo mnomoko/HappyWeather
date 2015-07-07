@@ -10,13 +10,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +36,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
+import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
+import mnomoko.android.com.happyweather.algorithme.CustomTextChangeListner;
 import mnomoko.android.com.happyweather.algorithme.PlaceJSONParser;
 import mnomoko.android.com.happyweather.data.loader.DataLoader;
+import mnomoko.android.com.happyweather.database.City;
+import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 
 /**
  * Created by mnomoko on 28/06/15.
@@ -50,13 +58,31 @@ public class AddFavoriteFragment extends DialogFragment {
     PlacesTask placesTask;
     ParserTask parserTask;
 
-    View root;
+//    View root;
     Button btnSave;
 
     public String ville;
     SharedPreferences sharedpref;
 
     Handler handler;
+    //---------------------------------------
+
+
+    View view;
+    EditText city;
+    String citizen;
+
+    MySqlLiteHelper databaseH;
+    CustomAutoCompleteTextViewDB myAutoComplete;
+    ArrayAdapter<City> myAdapter;
+
+    View root;
+
+    RelativeLayout searchLayout;
+    LinearLayout resultLayout;
+    RelativeLayout layout;
+
+    ResultFragment resultFragment = null;
 
     public AddFavoriteFragment() {}
 
@@ -79,52 +105,134 @@ public class AddFavoriteFragment extends DialogFragment {
 
         sharedpref = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
 
-        btnSave = (Button) root.findViewById(R.id.addFavoSave);
-        btnSave.setEnabled(false);
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        resultLayout = (LinearLayout) root.findViewById(R.id.result_container);
+        searchLayout = (RelativeLayout) root.findViewById(R.id.search_container);
 
-                run();
-                getDialog().dismiss();
-            }
-        });
+        try{
 
-        countries = new HashMap<String, String>();
-        for (String iso : Locale.getISOCountries()) {
-            Locale l = new Locale("", iso);
-            countries.put(l.getDisplayCountry().toUpperCase(), iso); //IS ADDED TO UPPERCASE
+            // instantiate database handler
+            databaseH = new MySqlLiteHelper((DrawerActivity)getActivity());
+
+            // autocompletetextview is in activity_main.xml
+            myAutoComplete = (CustomAutoCompleteTextViewDB) root.findViewById(R.id.myautocomplete);
+
+//            tvWriteText = (TextView) root.findViewById(R.id.editTextCitySearch);
+
+            myAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
+
+                    LinearLayout rl = (LinearLayout) arg1;
+                    TextView tv = (TextView) rl.getChildAt(0);
+                    TextView tv2 = (TextView) rl.getChildAt(1);
+                    myAutoComplete.setText(tv.getText().toString());
+
+                    String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
+
+                    run(tv.getText().toString(), tv2.getText().toString());
+//                    Bundle bundle=new Bundle();
+//                    bundle.putString("city", city);
+//
+//                    if(resultFragment == null) {
+//                        resultFragment = new ResultFragment();
+//                    }
+//                    else {
+//                        getChildFragmentManager().beginTransaction().remove(resultFragment).commit();
+//                        resultFragment = new ResultFragment();
+//                    }
+//                    //set Fragmentclass Arguments
+//                    resultFragment.setArguments(bundle);
+//
+//
+//
+//                    getChildFragmentManager().beginTransaction().add(R.id.result_container, resultFragment).commit();
+//
+//
+////                    resultFragment.changeCity(city);
+//
+//                    resultLayout.setVisibility(View.VISIBLE);
+//                    searchLayout.setVisibility(View.GONE);
+//
+//                    View view = getActivity().getCurrentFocus();
+//                    if (view != null) {
+//                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+//                                Context.INPUT_METHOD_SERVICE);
+//                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//                    }
+//
+////                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
+//                    getChildFragmentManager().executePendingTransactions();
+//
+//                    Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
+                }
+
+            });
+
+            // add the listener so it will tries to suggest while the user types
+            myAutoComplete.addTextChangedListener(new CustomTextChangeListner((DrawerActivity)getActivity()));
+
+//            // ObjectItemData has no value at first
+//            City[] ObjectItemData = new City[0];
+//
+//            // set the custom ArrayAdapter
+//            myAdapter = new AutocompleteDBCustomArrayAdapter((DrawerActivity)getActivity(), ObjectItemData);
+            myAdapter = ((DrawerActivity) getActivity()).getArrayAdapter();
+            ((DrawerActivity) getActivity()).setMyAutoComplete(myAutoComplete);
+            myAutoComplete.setAdapter(myAdapter);
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        atvPlacesFav = (AutoCompleteTextView) root.findViewById(R.id.atv_places_add_fav);
-        atvPlacesFav.setThreshold(1);
-
-        atvPlacesFav.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                placesTask = new PlacesTask();
-                placesTask.execute(s.toString());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String value = atvPlacesFav.getText().toString();
-                if(value.contains(",")) {
-                    value = value.split(",")[1];
-                    Log.e("AddFavoriteFragment", value.replace(" ", "").toUpperCase());
-                    if (countries.containsKey(value.replace(" ", "").toUpperCase())) {
-                        btnSave.setEnabled(true);
-                    }
-                }
-            }
-        });
+//        btnSave = (Button) root.findViewById(R.id.addFavoSave);
+//        btnSave.setEnabled(false);
+//        btnSave.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                run();
+//                getDialog().dismiss();
+//            }
+//        });
+//
+//        countries = new HashMap<String, String>();
+//        for (String iso : Locale.getISOCountries()) {
+//            Locale l = new Locale("", iso);
+//            countries.put(l.getDisplayCountry().toUpperCase(), iso); //IS ADDED TO UPPERCASE
+//        }
+//
+//        atvPlacesFav = (AutoCompleteTextView) root.findViewById(R.id.atv_places_add_fav);
+//        atvPlacesFav.setThreshold(1);
+//
+//        atvPlacesFav.addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                placesTask = new PlacesTask();
+//                placesTask.execute(s.toString());
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count,
+//                                          int after) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                String value = atvPlacesFav.getText().toString();
+//                if(value.contains(",")) {
+//                    value = value.split(",")[1];
+//                    Log.e("AddFavoriteFragment", value.replace(" ", "").toUpperCase());
+//                    if (countries.containsKey(value.replace(" ", "").toUpperCase())) {
+//                        btnSave.setEnabled(true);
+//                    }
+//                }
+//            }
+//        });
 
         builder.setView(root);
 
@@ -135,28 +243,36 @@ public class AddFavoriteFragment extends DialogFragment {
                 .create();
     }
 
-    public void run(){
+    public ArrayAdapter<City> getArrayAdapter() {
+        return myAdapter;
+    }
 
-        //ville  = name.getText().toString();
+    public void setArrayAdapter(ArrayAdapter<City> adapter) {
+        myAdapter = adapter;
+    }
 
-//        CustomAutoCompleteTextView name = (CustomAutoCompleteTextView) root.findViewById(R.id.atv_places_add_fav);
+    public CustomAutoCompleteTextViewDB getMyAutoComplete() {
+        return myAutoComplete;
+    }
 
-        //Toast.makeText(SearchCityWeather.this, name.getText().toString(), Toast.LENGTH_LONG).show();
-        String villeEtPays = atvPlacesFav.getText().toString();
-//        String villeEtPays = name.getText().toString();
-        String [] vrac = villeEtPays.split(",");
-        String vill = vrac[0];
-        String pays = vrac[1];
-//        String pays = vrac[vrac.length - 1];
-        pays = pays.replaceFirst("^ *", "").toUpperCase();
+    public void setMyAutoComplete(CustomAutoCompleteTextViewDB autoComplete) {
+        myAutoComplete = autoComplete;
+    }
 
-        if(pays.length() > 2) {
-            pays = countries.get(pays);
+    public void showSearchFragment() {
+        resultLayout.setVisibility(View.GONE);
+        searchLayout.setVisibility(View.VISIBLE);
+        myAutoComplete.setText("");
+
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        if(pays == null) {
-            if(vrac.length >= 3)
-                pays = countries.get(vrac[2]);
-        }
+    }
+
+    public void run(String vill, String pays){
 
         //Toast.makeText(AddFavoriteCity.this, vill + "," + pays, Toast.LENGTH_LONG).show();
         ville = vill + "," + pays;

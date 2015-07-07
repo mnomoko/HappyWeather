@@ -42,6 +42,7 @@ import java.util.List;
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
 import mnomoko.android.com.happyweather.adapters.DailyAdapter;
+import mnomoko.android.com.happyweather.algorithme.AutoResizeTextView;
 import mnomoko.android.com.happyweather.algorithme.CirclePagerIndicator;
 import mnomoko.android.com.happyweather.algorithme.SwipeListener;
 import mnomoko.android.com.happyweather.data.loader.DataLoader;
@@ -64,8 +65,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     FragmentManager fm;
     ImageView imgViewWeather;
     TextView tvNameDegres;
-    TextView tvNameCity;
-    //    AutoResizeTextView tvNameCity;
+    AutoResizeTextView tvNameCity;
     TextView tvNameMinDegres;
     TextView tvNameMaxDegres;
     TextView tvNameHumidity;
@@ -300,7 +300,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 
                         imgViewWeather = (ImageView) view.findViewById(R.id.imgViewWeather);
 //                tvNameCity = (AutoResizeTextView) view.findViewById(R.id.tvNameCity);
-                        tvNameCity = (TextView) view.findViewById(R.id.tvNameCity);
+                        tvNameCity = (AutoResizeTextView) view.findViewById(R.id.tvNameCity);
                         tvNameDegres = (TextView) view.findViewById(R.id.tvNameDegrees);
                         tvNameDegres.setTextSize(tvNameDegres.getTextSize() * (3 / 2));
                         tvNameMinDegres = (TextView) view.findViewById(R.id.tvNameMinDegres);
@@ -361,12 +361,6 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                         imgViewWeather.setImageResource(context.getResources().getIdentifier("_" + icon, "drawable", context.getPackageName()));
 
                         tvNameCity.setText(name, TextView.BufferType.NORMAL);
-                        int size = tvNameCity.getText().length();
-                        if (size < 6) {
-                            tvNameCity.setTextSize(tvNameCity.getTextSize() * (5 / 3));
-                        } else if (size < 13) {
-                            tvNameCity.setTextSize(tvNameCity.getTextSize() * (3 / 2));
-                        }
                         tvNameDegres.setText(temp + " C°");
                         tvNameMinDegres.setText("min : " + tempMin + " C°");
                         tvNameMaxDegres.setText("max : " + tempMax + " C°");

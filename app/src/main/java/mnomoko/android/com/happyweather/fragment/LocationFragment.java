@@ -1,191 +1,254 @@
 package mnomoko.android.com.happyweather.fragment;
 
-import android.app.Fragment;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import mnomoko.android.com.happyweather.R;
+import mnomoko.android.com.happyweather.activities.DrawerActivity;
+import mnomoko.android.com.happyweather.algorithme.AutoResizeTextView;
+import mnomoko.android.com.happyweather.data.loader.DataLoader;
 
 /**
  * Created by mnomoko on 28/06/15.
  */
-public class LocationFragment extends Fragment implements LocationListener {
+public class LocationFragment extends DialogFragment {
 
-    private TextView latituteField;
-    private TextView longitudeField;
-    private TextView addressField;
-    private LocationManager locationManager;
-    private String provider;
-    private static Criteria criteria = new Criteria();
 
-    TextView degres;
-    TextView humidite;
-    TextView vent;
+    SharedPreferences sharedpreferences;
+    FragmentManager fm;
+    ImageView imgViewWeather;
+    TextView tvNameDegres;
+    AutoResizeTextView tvNameCity;
+    TextView tvNameMinDegres;
+    TextView tvNameMaxDegres;
+    TextView tvNameHumidity;
+    TextView tvNameWind;
+    CheckBox checkbox;
+    Button btnChangeLinvingCity;
+    View root;
+    RelativeLayout layout;
 
-    View view;
-    TextView city;
-    String add;
-    private ImageView imgView;
-    private TextView cityText;
-    private TextView condDescr;
-    private TextView temp;
-    ImageView imgIcon;
+    String city;
+    String favorites;
+
+    String longitude;
+    String latitude;
 
     public String weatherXML = null;
 
     private ProgressBar mProgressBar;
 
+    public LocationFragment(String lon, String lat) {
+        longitude = lon;
+        latitude = lat;
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        root = getActivity().getLayoutInflater().inflate(R.layout.location_fragment, null);
 
         //setContentView(R.layout.activity_location);
 
-        View root = inflater.inflate(R.layout.location_fragment, null);
-
-        addressField = (TextView) root.findViewById(R.id.address);
-
-        degres = (TextView) root.findViewById(R.id.textViewLocatDegres);
-        humidite = (TextView) root.findViewById(R.id.textViewLocatHumidite);
-        vent = (TextView) root.findViewById(R.id.textViewLocatVent);
-        imgIcon= (ImageView) root.findViewById(R.id.imageView1);
-
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+//        View root = inflater.inflate(R.layout.location_fragment, null);
 
 
-        provider = locationManager.getBestProvider(criteria, false);
-        Location location = locationManager.getLastKnownLocation(provider);
+        layout = (RelativeLayout) root.findViewById(R.id.background);
 
-        if (location != null) {
-            System.out.println("Provider " + provider + " has been selected.");
-            onLocationChanged(location);
+        city = null;
 
-        } else {
-            //latituteField.setText("Not available !");
-            //longitudeField.setText("Not available");
-        }
+        sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
+        favorites = sharedpreferences.getString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
 
+//        SharedPreferences.Editor editor = sharedpreferences.edit();
+//        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
+//        editor.commit();
 
-        return root;
+        fm = getChildFragmentManager();
+        imgViewWeather = (ImageView) root.findViewById(R.id.imgViewWeather);
+        tvNameCity = (AutoResizeTextView) root.findViewById(R.id.tvNameCity);
+//        /*int tvNameCityHeight = */tvNameCity.getLayoutParams().height *= 3;
+//        /*int tvNameCityWidth = */tvNameCity.getLayoutParams().width *= 3;
+        tvNameDegres = (TextView) root.findViewById(R.id.tvNameDegrees);
+        tvNameDegres.setTextSize(tvNameDegres.getTextSize() * (3/2));
+        tvNameMinDegres = (TextView) root.findViewById(R.id.tvNameMinDegres);
+        tvNameMaxDegres = (TextView) root.findViewById(R.id.tvNameMaxDegres);
+        tvNameHumidity = (TextView) root.findViewById(R.id.tvNameHumidity);
+        tvNameWind = (TextView) root.findViewById(R.id.tvNameWind);
 
-    }
+        checkbox = (CheckBox) root.findViewById(R.id.checkBox1);
+//        checkbox.setChecked(false);
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                if(checkbox.isChecked()) {
 
-    public void finder(String add){
-        //add  = addressField.getText().toString();
+                    favorites += city + ";";
+                    editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, favorites);
+                    editor.commit();
+                }
+                else {
+                    String temp = "";
+                    for(String s : favorites.split(";")) {
 
-        String uri = "http://api.openweathermap.org/data/2.5/weather?q=" + add;
-
-        new RequestTask().execute(uri);
-        //Intent it = new Intent(Malocation.this, Accueil.class);
-        //it.putExtra("name", add);
-        //startActivity(it);
-
-    }
-
-    public class RequestTask extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... uri) {
-            String responseString = null;
-
-            return responseString;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if(result != null) {
-
-                weatherXML = result;
-
-//                WeatherMatcher wm = new WeatherMatcher(weatherXML);
-//
-//                degres.setText((CharSequence) wm.getDegrees());
-//                humidite.setText((CharSequence) wm.getHumidity());
-//                vent.setText((CharSequence) wm.getWind());
-
-//                String moncode = WeatherMatcher.getIcon();
-//                new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
-//                        .execute(MY_URL_STRING+moncode+".png");
+                        if(!s.equals(city)) {
+                            temp += s + ";";
+                        }
+                        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, temp);
+                        editor.commit();
+                    }
+                }
             }
+        });
+
+
+        new LaunchRequest((DrawerActivity)getActivity()).execute(longitude, latitude);
+
+
+        builder.setView(root);
+
+        return builder
+                // Set Dialog Icon
+                .setIcon(R.drawable.ic_launcher)
+                .setMessage(R.string.localisation)
+                .create();
+
+    }
+
+    public class LaunchRequest extends AsyncTask<String, String, String> {
+
+        /** application context. */
+        private Context _context;
+
+        private ProgressDialog dialog;
+        private DrawerActivity activity;
+        public LaunchRequest(DrawerActivity activity) {
+            this.activity = activity;
+            _context = activity;
+            dialog = new ProgressDialog(_context);
         }
 
-    }
+        @Override
+        protected void onPreExecute() {
+            this.dialog.setMessage("Chargement..");
+            this.dialog.show();
+        }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        locationManager.requestLocationUpdates(provider, 400, 1, getActivity());
-//    }
-//
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        locationManager.removeUpdates(getActivity());
-//    }
+        @Override
+        protected String doInBackground(String... strings) {
 
-    @Override
-    public void onLocationChanged(Location location) {
+            String lon = strings[0];
+            String lat = strings[1];
 
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
+            String content = DataLoader.getWeatherLocation(lon, lat);
+//            DataLoader.getWeatherCity(strings[0]);
 
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        StringBuilder builder = new StringBuilder();
-        try {
-            List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
-            //int maxLines = address.get(0).getMaxAddressLineIndex();
-            //for (int i=0; i<maxLines; i++) {
-            //String addressStr = address.get(0).getAddressLine(0);
-            String maville = address.get(0).getLocality();
-            builder.append(maville);
-            Log.e("MyLocalization.class", maville);
-//            finder(maville);
-            //builder.append(" ");
-            //}
+            return content;
+        }
 
-            String fnialAddress = builder.toString(); //addresse complete.
+        @Override
+        protected void onPostExecute(String s) {
 
-            addressField.setText(fnialAddress); //addresse finale.
-            finder(fnialAddress);
-            Log.e("MyLocalization.class", fnialAddress);
+            final String json = s;
+            /**
+             * Update list ui after process finished.
+             */
+            //TODO update list ui here, use
+            activity.runOnUiThread(new Runnable() {
+                public void run() {
+                    /**
+                     * Updating parsed JSON data
+                     */
 
-        } catch (IOException e) {}
-        catch (NullPointerException e) {}
-    }
+                    try {
+                        JSONObject object = new JSONObject(json);
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+                        String name = object.getString("name");
 
+                        city = name + "," + object.getJSONObject("sys").getString("country");
+                        Log.e("HomeFragment", "favorites = " + favorites);
+                        if(favorites != null) {
+                            List<String> array = Arrays.asList(favorites.split(";"));
+                            for(String a : array) {
+                                Log.e("HomeFragment", "fav = "+a);
+                                if (a.equals(city)){
+                                    checkbox.setChecked(true);
+                                }
+                                else {
+                                    checkbox.setChecked(false);
+                                }
+                            }
+//                    if(favorites != "") {
+//                    }
+                        }
 
-    }
+                        String temp = object.getJSONObject("main").getString("temp");
+                        String tempMin = object.getJSONObject("main").getString("temp_min");
+                        String tempMax = object.getJSONObject("main").getString("temp_max");
+                        String humidity = object.getJSONObject("main").getString("humidity");
+                        String wind = object.getJSONObject("wind").getString("speed");
 
-    @Override
-    public void onProviderEnabled(String provider) {
-        //Toast.makeText(this, "Enabled new provider " + provider, Toast.LENGTH_SHORT).show();
+                        String icon = object.getJSONArray("weather").getJSONObject(0).getString("icon");
+                        String main = object.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
+                        //new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
+                        imgViewWeather.setImageResource(_context.getResources().getIdentifier("_"+icon, "drawable", _context.getPackageName()));
 
-    }
+                        tvNameCity.setText(city, TextView.BufferType.EDITABLE);
+                        tvNameDegres.setText(temp + " C°");
+                        tvNameMinDegres.setText("min : " + tempMin + " C°");
+                        tvNameMaxDegres.setText("max : " + tempMax + " C°");
+                        tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
+                        tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
 
-    @Override
-    public void onProviderDisabled(String provider) {
-        //Toast.makeText(this, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
+//                String name = object.getString("name");
+//                tvNameCity.setText(name);
+//                String tempMin = object.getJSONObject("main").getString("temp_min");
+//                String tempMax = object.getJSONObject("main").getString("temp_max");
+//                String humidity = object.getJSONObject("main").getString("humidity");
+//                String wind = object.getJSONObject("wind").getString("speed");
+
+//                WallpaperManager myWallpaperManager
+//                        = WallpaperManager.getInstance(getActivity().getApplicationContext());
+//                    myWallpaperManager.setResource(R.drawable.sun);
+
+//                layout.setBackground(HomeFragment.getDrawable(getActivity(), R.drawable.sun));
+//                        DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                    }
+                    catch (JSONException e) {
+                        Log.e(getActivity().getLocalClassName(), "_"+e.getMessage());
+                    }
+
+                }
+            });
+
+        }
     }
 }

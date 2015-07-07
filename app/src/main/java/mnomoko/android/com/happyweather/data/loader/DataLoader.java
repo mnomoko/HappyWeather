@@ -25,6 +25,52 @@ public class DataLoader {
         return "";
     }
 
+    public static String getWeatherLocation(String lon, String lat) {
+        //api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}
+
+
+        String link = "http://api.openweathermap.org/data/2.5/weather?";
+
+        String response = null;
+        try {
+
+
+            String request = link + "lat=" + lat + "&lon=" + lon + "&units=metric";
+            Log.e("DataLoader", request);
+//            String request = text + city + extend;
+            URL url = new URL(request);
+            Log.e("DataLoader", request);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            int responseCode = conn.getResponseCode();
+
+            if(responseCode == 200) {
+                InputStream inputstream = conn.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputstream));
+                response = "";
+                String line;
+                while ((line = br.readLine()) != null){
+                    response += line;
+                }
+                Log.e("JSONObject", response);
+            }
+        }
+        catch (MalformedURLException m) {
+            Log.e("DataLoader.class", "1 "+m.getMessage());
+        }
+        catch (ProtocolException p) {
+            Log.e("DataLoader.class", "2 "+p.getMessage());
+        }
+        catch (IOException i) {
+            Log.e("DataLoader.class", "3 " + i.getMessage());
+        }
+//        catch (Exception e) {
+//            Log.e("DataLoader.class", ""+e.getMessage());
+//        }
+        return response;
+    }
+
     public static String getWeatherCity(String city) {
 
         String hourly = "http://api.openweathermap.org/data/2.5/forecast?q=paris,fr&units=metric&cnt=5";
