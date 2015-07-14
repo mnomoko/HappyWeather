@@ -126,7 +126,14 @@ public class LocationFragment extends DialogFragment {
         });
 
 
-        new LaunchRequest((DrawerActivity)getActivity()).execute(longitude, latitude);
+        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+        if(!connect) {
+
+            ((DrawerActivity) getActivity()).showConnectionError();
+        }
+        else {
+            new LaunchRequest((DrawerActivity) getActivity()).execute(longitude, latitude);
+        }
 
 
         builder.setView(root);

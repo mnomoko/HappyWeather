@@ -117,7 +117,15 @@ public class LocationFragmentDialog extends Fragment {
         String lon =getArguments().getString("longitude");
 
 
-        new LaunchRequest((DrawerActivity)getActivity()).execute(lon, lat);
+
+        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+        if(!connect) {
+
+            ((DrawerActivity) getActivity()).showConnectionError();
+        }
+        else {
+            new LaunchRequest((DrawerActivity)getActivity()).execute(lon, lat);
+        }
 
         return root;
 

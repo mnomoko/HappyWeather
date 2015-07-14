@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {// SQL statement to create city table
-        String CREATE_CITY_TABLE = "CREATE TABLE cities ( " +
+        String CREATE_CITY_TABLE = "CREATE TABLE IF NOT EXISTS cities ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT, "+
                 "code TEXT )";
@@ -44,9 +45,21 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void dropTable(SQLiteDatabase db) {
+    public void dropTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
         // Drop older cities table if existed
         db.execSQL("DROP TABLE IF EXISTS cities");
+    }
+
+    public void createTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String CREATE_CITY_TABLE = "CREATE TABLE cities ( " +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, "+
+                "code TEXT )";
+
+        // create cities table
+        db.execSQL(CREATE_CITY_TABLE);
     }
 
 
@@ -71,6 +84,67 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         int cnt = cursor.getCount();
         cursor.close();
         return cnt;
+    }
+
+    public void addCities(List<String> cities) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+//        onCreate(db);
+
+        db.beginTransaction();
+        String sql = "INSERT INTO " + TABLE_CITIES + " ("+ KEY_NAME + ", " + KEY_CODE + ") values(?,?)";
+        SQLiteStatement insert = db.compileStatement(sql);
+
+        for(String s : cities) {
+
+            String[] array = s.split("\t");
+
+            insert.bindString(1, array[1]);
+            insert.bindString(2, array[4]);
+            insert.execute();
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        // 4. close
+        db.close();
+
+    }
+
+    public void addCitiesNative(List<String> cities) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        int i = 0;
+        for(String s : cities) {
+
+            String[] array = s.split("\t");
+
+
+            // 2. create ContentValues to add key "column"/value
+            ContentValues values = new ContentValues();
+            values.put(KEY_NAME, array[1]); // get name
+            values.put(KEY_CODE, array[4]); // get code
+
+
+            // 3. insert
+            db.insert(TABLE_CITIES, // table
+                    null, //nullColumnHack
+                    values); // key/value -> keys = column names/ values = column values
+
+            if(i == 1000) {
+                Log.e("MySqlLiteHealper", "" + i);
+                i = 0;
+            }
+            i++;
+        }
+
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        // 4. close
+        db.close();
     }
 
     public void addCity(City city){
@@ -118,7 +192,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         city.setName(cursor.getString(1));
         city.setCode(cursor.getString(2));
 
-        Log.d("getCity(" + id + ")", city.toString());
+//        Log.d("getCity(" + id + ")", city.toString());
 
         // 5. return city
         return city;
@@ -131,14 +205,28 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         String sql = "";
         sql += "SELECT * FROM " + TABLE_CITIES;
 //        sql += " WHERE " + KEY_NAME + " LIKE '%" + searchTerm + "%'";
-        sql += " WHERE " + KEY_NAME + " LIKE '" + searchTerm + "%'";
+        sql += " WHERE " + KEY_NAME + " = '" + searchTerm + "'";
         sql += " ORDER BY " + KEY_ID + " DESC";
-        sql += " LIMIT 0,5";
+        sql += " LIMIT 0,8";
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         // execute the query
         Cursor cursor = db.rawQuery(sql, null);
+
+        if(cursor.getCount() == 0) {
+
+            // select query
+            sql = "";
+            sql += "SELECT * FROM " + TABLE_CITIES;
+    //        sql += " WHERE " + KEY_NAME + " LIKE '%" + searchTerm + "%'";
+            sql += " WHERE " + KEY_NAME + " LIKE '" + searchTerm + "%'";
+            sql += " ORDER BY " + KEY_ID + " DESC";
+            sql += " LIMIT 0,8";
+
+            // execute the query
+            cursor = db.rawQuery(sql, null);
+        }
 
         int recCount = cursor.getCount();
 
@@ -151,7 +239,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
 
                 String objectName = cursor.getString(cursor.getColumnIndex(KEY_NAME));
                 String objectCode = cursor.getString(cursor.getColumnIndex(KEY_CODE));
-                Log.e("Unknown", "objectName: " + objectName);
+//                Log.e("Unknown", "objectName: " + objectName);
 
                 City myObject = new City(objectName, objectCode);
 
@@ -194,7 +282,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        Log.d("getAllCities()", cities.toString());
+//        Log.d("getAllCities()", cities.toString());
 
         // return cities
         return cities;
@@ -238,7 +326,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         // 3. close
         db.close();
 
-        Log.d("deleteCity", city.toString());
+//        Log.d("deleteCity", city.toString());
 
     }
 }

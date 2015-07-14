@@ -4,22 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import mnomoko.android.com.happyweather.R;
-import mnomoko.android.com.happyweather.database.City;
+import mnomoko.android.com.happyweather.data.loader.DataLoader;
 import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 
 /**
@@ -28,7 +21,7 @@ import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 public class SplashScreen extends Activity {
 
     private static String CITIES_FILE = "cities_file.txt";
-    private static int SPLASH_TIME_OUT = 1000;
+    private static int SPLASH_TIME_OUT = 7000;
     List<String> content = null;
 
     RelativeLayout layout;
@@ -47,31 +40,44 @@ public class SplashScreen extends Activity {
 
         //check if data is already download and when, if it been too far in the pass or if there are nothing download
         //so the splash screen will appear and data will be load
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                setDataBase();
+//
+//                Intent i = new Intent(SplashScreen.this, MainActivity.class);
+//                startActivity(i);
+//            }
+//        }, SPLASH_TIME_OUT);
 
-                setDataBase();
-
-                Intent i = new Intent(SplashScreen.this, MainActivity.class);
-                startActivity(i);
-            }
-        }, SPLASH_TIME_OUT);
+        setDataBase();
+        Intent i = new Intent(SplashScreen.this, MainActivity.class);
+        startActivity(i);
     }
 
     public void setDataBase() {
         MySqlLiteHelper db = new MySqlLiteHelper(this);
+//        db.dropTable();
+//        db.createTable();
 //        for(City c : db.getAllCities()) {
 //            db.deleteCity(c);
 //        }
+
         int count = db.getRowCount();
-        Log.e("___Count Row", ""+count);
+        Log.e("___Count Row", "" + count);
         if(count < 10) {
 
             content = new ArrayList<>();
 
-            new DownloadCityFile(db).execute();
-            //CSV
+            try {
+                new DownloadCityFile(db).execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        //CSV
 //            for(int i = 1; i<content.size(); i++) {
 
 
@@ -116,48 +122,8 @@ public class SplashScreen extends Activity {
         protected List<String> doInBackground(Void... voids) {
 
             List<String> page = new ArrayList<>();
-            try {
-                String fileName = "cities.txt"; //The file that will be saved on your computer
-                URL url = new URL("http://openweathermap.org/help/city_list.txt"); //The file that you want to download
+            page = DataLoader.loadCitiesFile();
 
-                HttpURLConnection.setFollowRedirects(true);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setDoOutput(false);
-                con.setReadTimeout(20000);
-                con.setRequestProperty("Connection", "keep-alive");
-
-                con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:16.0) Gecko/20100101 Firefox/16.0");
-                ((HttpURLConnection) con).setRequestMethod("GET");
-                //System.out.println(con.getContentLength()) ;
-                con.setConnectTimeout(5000);
-                BufferedInputStream in = new BufferedInputStream(con.getInputStream());
-                BufferedReader r = new BufferedReader(
-                        new InputStreamReader(in, StandardCharsets.UTF_8));
-                int responseCode = con.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    System.out.println(responseCode);
-                }
-                StringBuffer buffer = new StringBuffer();
-                int chars_read;
-                //int total = 0;
-//                FileOutputStream outputStream;
-//                outputStream = openFileOutput(CITIES_FILE, Context.MODE_PRIVATE);
-                String line = r.readLine();
-                while (line != null)
-                {
-
-//                    Log.e("line", line);
-//                    buffer.append(line);
-                    page.add(line);
-
-                    line = r.readLine();
-                }
-//                outputStream.write(buffer.toString().getBytes());
-//                outputStream.close();
-            }
-            catch (IOException e) {
-                Log.e("SplashScreen", "" + e.getMessage());
-            }
             return page;
         }
 
@@ -165,19 +131,37 @@ public class SplashScreen extends Activity {
         protected void onPostExecute(List<String> list) {
             super.onPostExecute(list);
 
-            Log.e("____________s", ""+list.size());
-            content.addAll(list);
+//            Log.e("____________s", ""+list.size());
+//            content.addAll(list);
 
-            int i = 1;
-            while(content.get(i)!= null && i < 100) {
+            db.addCities(list);
 
-                String s = content.get(i);
-                String[] array = s.split("\t");
+//            int i = 1;
+//            while(content.get(i)!= null && i < 100) {
+//
+//                String s = content.get(i);
+//                String[] array = s.split("\t");
+//
+//                Log.e("addCity", array[1] + ", " + array[4]);
+//                db.addCity(new City(array[1], array[4]));
+//                i++;
+//            }
 
-                Log.e("addCity", array[1] + ", " + array[4]);
-                db.addCity(new City(array[1], array[4]));
-                i++;
-            }
+//            Long tsLong = System.currentTimeMillis()/1000;
+//            String ts = tsLong.toString();
+//            Log.e("SplashScreen", "Start : " + ts);
+
+//            for(String s : list) {
+//
+//                String[] array = s.split("\t");
+//
+////                Log.e("addCity", array[1] + ", " + array[4]);
+//                db.addCity(new City(array[1], array[4]));
+//            }
+
+//            tsLong = System.currentTimeMillis()/1000;
+//            ts = tsLong.toString();
+//            Log.e("SplashScreen", "End : " + ts);
         }
     }
 }

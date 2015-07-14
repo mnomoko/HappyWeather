@@ -2,6 +2,8 @@ package mnomoko.android.com.happyweather.algorithme;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 
 /**
@@ -28,6 +30,16 @@ public class CustomAutoCompleteTextViewDB extends AutoCompleteTextView {
     protected void performFiltering(final CharSequence text, final int keyCode) {
         String filterText = "";
         super.performFiltering(filterText, keyCode);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            InputMethodManager imm = (InputMethodManager) getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getApplicationWindowToken(), 0);
+        }
+        return super.onTouchEvent(event);
     }
 }
 

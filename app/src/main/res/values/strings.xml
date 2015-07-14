@@ -44,4 +44,7 @@
     <string name="GPSAlertDialogTitle">Configuration du GPS</string>
     <string name="GPSAlertDialogMessage">Le GPS n\'est pas actif.</string>
     <string name="localisation">Votre localisation</string>
+    <string name="data">Données mobile</string>
+    <string name="error_connection">Vos données mobile ne sont pas activé.\\nVeuillez à changer vos paramètres.</string>
+    <string name="enable_data">Activer les données mobile</string>
 </resources>

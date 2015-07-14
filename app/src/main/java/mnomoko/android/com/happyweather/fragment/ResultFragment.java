@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -139,31 +140,24 @@ public class ResultFragment extends Fragment {
         Log.e("SharedPreferences", sharedpreferences.getAll().toString());
 
 
-        new LaunchRequest((DrawerActivity)getActivity()).execute(bundleCity);
+
+        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+        if(!connect) {
+
+            ((DrawerActivity) getActivity()).showConnectionError();
+        }
+        else {
+            new LaunchRequest((DrawerActivity) getActivity()).execute(bundleCity);
+        }
 
         return root;
     }
 
-//    public void changeCity(String c) {
-//
-//        if(!first) {
-//            city = c;
-//            resetField();
-//            new LaunchRequest((DrawerActivity) getActivity()).execute(city);
-//
-//            first = false;
-//        }
-//    }
-//
-//    public void resetField() {
-//
-//        tvNameCity.invalidate();
-//        tvNameDegres.invalidate();
-//        tvNameMinDegres.invalidate();
-//        tvNameMaxDegres.invalidate();
-//        tvNameHumidity.invalidate();
-//        tvNameWind.invalidate();
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        return true;
+    }
 
     public class LaunchRequest extends AsyncTask<String, String, String> {
 
@@ -181,7 +175,7 @@ public class ResultFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
-//            this.dialog.show();
+            this.dialog.show();
         }
 
         @Override

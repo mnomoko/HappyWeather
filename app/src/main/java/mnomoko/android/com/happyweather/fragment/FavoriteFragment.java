@@ -106,7 +106,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         viewFlipper = (ViewFlipper) root.findViewById(R.id.viewFlipper);
         circlePagerIndicator = (CirclePagerIndicator) root.findViewById(R.id.circlePageIndicator);
         circlePagerIndicator.setViewFlipper(viewFlipper);
-        final GestureDetector gestureDetector = new GestureDetector(getActivity(), new CustomGestureDetector(viewFlipper, circlePagerIndicator));
+        final GestureDetector gestureDetector = new GestureDetector(getActivity(), new CustomGestureDetectorFlipper(viewFlipper, circlePagerIndicator));
 
         viewFlipper.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -198,8 +198,15 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         for (int i = 0; i < end; i++) {
             Log.e("Favorite", cities[i]);
 
-            new LaunchRequest((DrawerActivity)getActivity()).execute(cities[i]);
 
+            boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+            if(!connect) {
+
+                ((DrawerActivity) getActivity()).showConnectionError();
+            }
+            else {
+                new LaunchRequest((DrawerActivity) getActivity()).execute(cities[i]);
+            }
         }
         circlePagerIndicator.invalidate();
     }
@@ -310,22 +317,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 
                         lvDaily = (ListView) view.findViewById(R.id.lvDaily);
                         lvDaily.setOnTouchListener(new View.OnTouchListener(/*((FavoriteFragment.this).getActivity()), gestureListener*/) {
-                            //                    @Override
-//                    public boolean onTouch(View view, MotionEvent motionEvent) {
-//                        switch ((motionEvent.getAction())) {
-//                            case MotionEvent.ACTION_DOWN:
-//                                detector.onTouchEvent(motionEvent);
-//                                break;
-//                            case MotionEvent.ACTION_UP:
-//                                detector.onTouchEvent(motionEvent);
-//                                break;
-//                            case MotionEvent.ACTION_MOVE:
-//                                detector.onTouchEvent(motionEvent);
-//                                break;
-//                        }
-//                        return true;
-//                    }
-//                });
+
                             int before = -1;
 
                             @Override
@@ -333,7 +325,8 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                                 switch (event.getAction()) {
                                     case MotionEvent.AXIS_HSCROLL:
                                         detector.onTouchEvent(event);
-                                        break;
+                                        return true;
+//                                        break;
                                     case MotionEvent.ACTION_DOWN:
                                         before = ((ListView) v).getFirstVisiblePosition();
                                         break;
@@ -386,6 +379,15 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                                     Double.valueOf(lvTempMax).intValue(), lvDate));
                         }
                         lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
+                        lvDaily.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                if(detector.onTouchEvent(event)){
+                                    return true;
+                                }
+                                return false;
+                            }
+                        });/*new CustomGestureDetectorListView(lvDaily));*/
                         FavoriteFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
 //                FavoriteFragment.setBackgroundView(bigLayout, getActivity(), R.drawable.sun);
 
@@ -406,6 +408,12 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
             });
 
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        getActivity().dispatchTouchEvent(event);
+        return detector.onTouchEvent(event);
     }
 
     public void setFlipperContent(List<Weather> vawe) {
@@ -453,33 +461,6 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 
         }
     }
-//
-//    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
-//        @Override
-//        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-//                               float velocityY) {
-//            Log.e("FavoriteFragment", "move");
-//            try {
-//                if (Math.abs(e1.getY() - e2.getY()) > 250)
-//                    return false;
-//                // right to left swipe
-//                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    viewFlipper.setInAnimation(slide_in_left);
-//                    viewFlipper.setOutAnimation(slide_in_left);
-//                    viewFlipper.showNext();
-//                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    viewFlipper.setInAnimation(slide_out_right);
-//                    viewFlipper.setOutAnimation(slide_out_right);
-//                    viewFlipper.showPrevious();
-//                }
-//            } catch (Exception e) {
-//                // nothing
-//            }
-//            return false;
-//        }
-//    }
 
     Animation slideInRightAnimation;
     Animation slideOutLeftAnimation;
@@ -508,12 +489,12 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         viewFlipper.showPrevious();
     }
 
-    class CustomGestureDetector extends GestureDetector.SimpleOnGestureListener {
+    class CustomGestureDetectorFlipper extends GestureDetector.SimpleOnGestureListener {
 
         ViewFlipper viewFlipper;
         CirclePagerIndicator indicator;
 
-        public CustomGestureDetector(ViewFlipper viewFlipper, CirclePagerIndicator indicator) {
+        public CustomGestureDetectorFlipper(ViewFlipper viewFlipper, CirclePagerIndicator indicator) {
             this.viewFlipper = viewFlipper;
             this.indicator = indicator;
         }
@@ -524,33 +505,6 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
             int displayedChild = viewFlipper.getDisplayedChild();
             int childCount = viewFlipper.getChildCount();
 
-
-            Log.i("FavoriteFragment", "onFling has been called!");
-//            final int SWIPE_MIN_DISTANCE = 120;
-//            final int SWIPE_MAX_OFF_PATH = 250;
-//            final int SWIPE_THRESHOLD_VELOCITY = 200;
-//            try {
-//                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-//                    return false;
-//                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    Log.i("FavoriteFragment", "Right to Left");
-//                    swiftLeft(viewFlipper);
-////                    viewFlipper.showNext();
-////            indicator.setCurrentDisplayedChild(displayedChild);
-//                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    Log.i("FavoriteFragment", "Left to Right");
-//
-//                    swipeRight(viewFlipper);
-////                    viewFlipper.showPrevious();
-//
-////            indicator.setCurrentDisplayedChild(displayedChild);
-//                }
-//            } catch (Exception e) {
-//                // nothing
-//            }
-
             float sensibility = 50;
             if ((e1.getX() - e2.getX()) > sensibility) {
                 if (displayedChild == childCount - 1) {
@@ -559,6 +513,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 //                    viewFlipper.showPrevious();
                     swipeLeft(viewFlipper);
                     indicator.setCurrentDisplayedChild(viewFlipper.getDisplayedChild());
+                    return true;
                 }
             } else if ((e2.getX() - e1.getX()) > sensibility) {
                 if (displayedChild <= 0) {
@@ -567,11 +522,11 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 //                    viewFlipper.showNext();
                     swipeRight(viewFlipper);
                     indicator.setCurrentDisplayedChild(viewFlipper.getDisplayedChild());
+                    return true;
                 }
             }
 
-            return super.onFling(e1, e2, velocityX, velocityY);
-//            return true;
+            return false;
         }
     }
 }

@@ -40,6 +40,8 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             android:completionThreshold="1"
+            android:maxLines="1"
+            android:imeOptions="flagNoExtractUi"
             android:layout_centerInParent="true" />
 
     </RelativeLayout>

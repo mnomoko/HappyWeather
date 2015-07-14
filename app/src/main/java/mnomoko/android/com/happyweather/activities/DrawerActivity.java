@@ -4,18 +4,22 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.http.HttpResponseCache;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -49,6 +53,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -94,9 +100,6 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 
     ArrayAdapter<City> myAdapter;
 
-    ActionBar actionBar;
-    private SearchView searchView;
-
     public SharedPreferences sharedpreferences;
 
     //FOR AUTOCOMPLETE DB
@@ -131,9 +134,19 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawer_main);
 
         context = getBaseContext();
+
+        try {
+            File httpCacheDir = new File(context.getCacheDir(), "http");
+            long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+            HttpResponseCache.install(httpCacheDir, httpCacheSize);
+        }
+        catch (IOException e) {
+            Log.i(TAG, "HTTP response cache installation failed:" + e);
+        }
+
+        setContentView(R.layout.drawer_main);
 
 
         if (!isGooglePlayServicesAvailable()) {
@@ -174,6 +187,7 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 
         // set the custom ArrayAdapter
         myAdapter = new AutocompleteDBCustomArrayAdapter(this, ObjectItemData);
+
 //
 //        actionBar = getSupportActionBar();
 //        actionBar.setDisplayHomeAsUpEnabled(true);
@@ -288,6 +302,43 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 
     }
 
+    public boolean checkConnection() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void setMobileData(Context context) {
+        try {
+            ConnectivityManager dataManager;
+            dataManager  = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Method dataMtd = null;
+            try {
+                dataMtd = ConnectivityManager.class.getDeclaredMethod("setMobileDataEnabled", boolean.class);
+                dataMtd.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "DA1_" + e.getMessage());
+            }
+            try {
+                dataMtd.invoke(dataManager, true);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "DA_2" + e.getMessage());
+            } catch (IllegalAccessException e) {
+                Log.e(TAG, "DA_3" + e.getMessage());
+            } catch (InvocationTargetException e) {
+                Log.e(TAG, "DA_4" + e.getMessage());
+            }
+        }
+        catch (Exception e) {
+            Log.e(TAG, "DA_"+e.getMessage());
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -299,73 +350,14 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         switch(item.getItemId()) {
             case R.id.action_location:
 
-                ////show error dialog if GoolglePlayServices not available
-//                if (!isGooglePlayServicesAvailable()) {
-//                    finish();
-//                }
-//                createLocationRequest();
-//                mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                        .addApi(LocationServices.API)
-//                        .addConnectionCallbacks(this)
-//                        .addOnConnectionFailedListener(this)
-//                        .build();
-
                 updateUI();
-
-//                Bundle bundle = new Bundle();
-//                bundle.putString("latitude", ""+latitude);
-//                bundle.putString("longitude", ""+longitude);
-//                if(locationFragment == null) {
+                if(Double.valueOf(longitude) == 0 && Double.valueOf(latitude) == 0) {
                     LocationFragment locationFragment = new LocationFragment(longitude, latitude);
-//            Log.e("HomeFragment.class", fm.toString());
                     locationFragment.show(getSupportFragmentManager(), getResources().getString(R.string.favorite));
-//                    locationFragment = new LocationFragment();
-//                    locationFragment.setArguments(bundle);
+                }
+                else {
 
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, locationFragment).commit();
-//                }
-//                else {
-//                    getSupportFragmentManager().beginTransaction().detach(locationFragment).commit();
-//                    locationFragment = new LocationFragment();
-//                    locationFragment.setArguments(bundle);
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, locationFragment).commit();
-//                }
-
-
-//                if (providerLocationTracker.gpsIsEnable())
-//                {
-//
-//                    Location location = fallbackLocationTracker.getLocation();
-//                    Log.e("DrawerActivity", "location = " + location);
-//                    double lat = location.getLatitude();
-//                    double lon = location.getLongitude();
-//
-//                    Log.e("DrawerActivity", "lon = " + lon + " && lat = " + lat);
-//
-//                    Bundle bundle = new Bundle();
-//                    bundle.putString("latitude", ""+lat);
-//                    bundle.putString("longitude", ""+lon);
-//                    if(locationFragment == null) {
-//                        locationFragment = new LocationFragment();
-//                        locationFragment.setArguments(bundle);
-//
-//                        getSupportFragmentManager().beginTransaction().add(R.id.container, locationFragment).commit();
-//                    }
-//                    else {
-//                        getSupportFragmentManager().beginTransaction().detach(locationFragment).commit();
-//                        locationFragment = new LocationFragment();
-//                        locationFragment.setArguments(bundle);
-//                        getSupportFragmentManager().beginTransaction().add(R.id.container, locationFragment).commit();
-//                    }
-//                }
-//                else
-//                {
-//                    // can't get location
-//                    // GPS or Network is not enabled
-//                    // Ask user to enable GPS/network in settings
-//                    providerLocationTracker.showSettingsAlert(this);
-//                }
-
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -407,6 +399,12 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop fired ..............");
+
+        HttpResponseCache cache = HttpResponseCache.getInstalled();
+        if (cache != null) {
+            cache.flush();
+        }
+
         mGoogleApiClient.disconnect();
         Log.d(TAG, "isConnected ...............: " + mGoogleApiClient.isConnected());
     }
@@ -447,15 +445,41 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Firing onLocationChanged..............................................");
         mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-//        updateUI();
+        if(mCurrentLocation.getLatitude() != 0 || mCurrentLocation.getLongitude() != 0) {
+            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+            updateUI();
+        }
     }
 
     private void updateUI() {
         Log.d(TAG, "UI update initiated .............");
         if (null != mCurrentLocation) {
-            String lat = String.valueOf(mCurrentLocation.getLatitude());
-            String lng = String.valueOf(mCurrentLocation.getLongitude());
+            String lat;
+            String lng;
+
+//            ProgressDialog pd = new ProgressDialog(this);
+//            pd.setMessage("Localisation en cours..");
+//            pd.show();
+//            do {
+//
+//                lat = String.valueOf(mCurrentLocation.getLatitude());
+//                lng = String.valueOf(mCurrentLocation.getLongitude());
+////                Toast.makeText(this, "lat : " + lat + " && lng : " + lng, Toast.LENGTH_SHORT).show();
+//                Log.e("Drawer__", "lat : " + lat + " && lng : " + lng);
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            while (Double.valueOf(lng) != 0 || Double.valueOf(lat) != 0);
+//
+//            if (pd.isShowing()) {
+//                pd.dismiss();
+//            }
+
+            lat = String.valueOf(mCurrentLocation.getLatitude());
+            lng = String.valueOf(mCurrentLocation.getLongitude());
 
             longitude = lng;
             latitude = lat;
@@ -468,6 +492,27 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         } else {
             Log.d(TAG, "location is null ...............");
         }
+    }
+
+    public void showConnectionError() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.error_connection)
+                .setTitle(R.string.data)
+                .setCancelable(false)
+                .setPositiveButton(R.string.enable_data, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent();
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.setAction(Settings.ACTION_SETTINGS);
+                                startActivity(intent);
+
+                                finish();
+                            }
+                        }
+
+                );
+        builder.show();
     }
 
     /* The click listner for ListView in the navigation drawer */

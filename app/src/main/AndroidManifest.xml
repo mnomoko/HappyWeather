@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mnomoko.android.com.happyweather" >
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,10 +15,13 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="orientation|keyboard" >
         </activity>
 
-        <activity android:name=".activities.DrawerActivity">
+        <activity android:name=".activities.DrawerActivity"
+            android:configChanges="orientation|keyboard"
+            android:windowSoftInputMode="stateHidden|adjustResize">
 
             <!-- to identify this activity as "searchable" -->
             <intent-filter>
@@ -31,7 +36,8 @@
 
         <activity
             android:name=".activities.SplashScreen"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:configChanges="orientation|keyboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

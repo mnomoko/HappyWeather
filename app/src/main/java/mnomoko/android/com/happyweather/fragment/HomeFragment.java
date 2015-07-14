@@ -3,6 +3,7 @@ package mnomoko.android.com.happyweather.fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,12 +12,16 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,6 +62,7 @@ public class HomeFragment extends Fragment {
     Button btnChangeLinvingCity;
     View root;
     RelativeLayout layout;
+    LinearLayout linearlayout;
 
     String city;
     String favorites;
@@ -68,7 +74,16 @@ public class HomeFragment extends Fragment {
 
         root = inflater.inflate(R.layout.home_fragment, container, false);
 
-        layout = (RelativeLayout) root.findViewById(R.id.background);
+        if(getActivity().getBaseContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            // code to do for Portrait Mode
+            layout = (RelativeLayout) root.findViewById(R.id.background);
+            DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+        } else {
+            // code to do for Landscape Mode
+            linearlayout = (LinearLayout) root.findViewById(R.id.background);
+            DrawerActivity.setBackgroundView(linearlayout, getActivity(), R.drawable.sun);
+        }
 
         city = null;
 
@@ -131,22 +146,71 @@ public class HomeFragment extends Fragment {
         weathers = new ArrayList<Weather>();
 
 //        sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
-        String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
+        final String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
 
         Log.e("SharedPreferences", sharedpreferences.getAll().toString());
 
-        if(favo == null) {
-            //show a dialog which add a name in favo
-            AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
+        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+        if(connect) {
+
+            if (favo == null) {
+                //show a dialog which add a name in favo
+                AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
+
+                Window window = alertdFragment.getDialog().getWindow();
+
+                // set "origin" to top left corner, so to speak
+                window.setGravity(Gravity.TOP);
+
+                // after that, setting values for x and y works "naturally"
+                WindowManager.LayoutParams params = window.getAttributes();
+                params.x = 300;
+                params.y = 100;
+                window.setAttributes(params);
 //            Log.e("HomeFragment.class", fm.toString());
-            alertdFragment.show(fm, getResources().getString(R.string.favorite));
+                alertdFragment.show(fm, getResources().getString(R.string.favorite));
+            } else {
+//            tvNameDegres.setText(favo);
+                new LaunchRequest((DrawerActivity) getActivity()).execute(favo);
+            }
         }
         else {
-//            tvNameDegres.setText(favo);
-            new LaunchRequest((DrawerActivity)getActivity()).execute(favo);
+
+            ((DrawerActivity) getActivity()).showConnectionError();
         }
 
-        return root;
+            return root;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        outState.putString();
+//        //weathers
+//        outState.putString();
+
+
+//        String temp = first.getJSONObject("temp").getString("day");
+//        String tempMin = first.getJSONObject("temp").getString("min");
+//        String tempMax = first.getJSONObject("temp").getString("max");
+//        String pressure = first.getString("pressure");
+//        String wind = first.getString("speed");
+//        String humidity = first.getString("humidity");
+//
+//        String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
+//        String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
     }
 
     public class LaunchRequest extends AsyncTask<String, String, String> {
@@ -156,6 +220,7 @@ public class HomeFragment extends Fragment {
 
         private ProgressDialog dialog;
         private DrawerActivity activity;
+
         public LaunchRequest(DrawerActivity activity) {
             this.activity = activity;
             _context = activity;
@@ -165,7 +230,7 @@ public class HomeFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
-//            this.dialog.show();
+            this.dialog.show();
         }
 
         @Override
@@ -267,7 +332,6 @@ public class HomeFragment extends Fragment {
 //                    myWallpaperManager.setResource(R.drawable.sun);
 
 //                layout.setBackground(HomeFragment.getDrawable(getActivity(), R.drawable.sun));
-                        DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
                         lvDaily.invalidate();
 
                         if (dialog.isShowing()) {
