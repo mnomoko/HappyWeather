@@ -319,7 +319,8 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
             this.dialog.show();
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+//            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         }
 
         @Override

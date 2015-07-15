@@ -68,90 +68,107 @@ public class SearchFragment extends Fragment {
         resultLayout = (LinearLayout) root.findViewById(R.id.result_container);
         searchLayout = (RelativeLayout) root.findViewById(R.id.search_container);
 
-        try{
 
-            // instantiate database handler
-            databaseH = new MySqlLiteHelper((DrawerActivity)getActivity());
+        // instantiate database handler
+        databaseH = new MySqlLiteHelper((DrawerActivity)getActivity());
 
-            // autocompletetextview is in activity_main.xml
-            myAutoComplete = (CustomAutoCompleteTextViewDB) root.findViewById(R.id.myautocomplete);
+        // autocompletetextview is in activity_main.xml
+        myAutoComplete = (CustomAutoCompleteTextViewDB) root.findViewById(R.id.myautocomplete);
+
+        if(savedInstanceState != null) {
+
+            resultLayout.setVisibility(View.GONE);
+            searchLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+
+            try{
+
 
 //            tvWriteText = (TextView) root.findViewById(R.id.editTextCitySearch);
 
-            myAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                myAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                @Override
-                public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
 
-                    LinearLayout rl = (LinearLayout) arg1;
-                    TextView tv = (TextView) rl.getChildAt(0);
-                    TextView tv2 = (TextView) rl.getChildAt(1);
-                    myAutoComplete.setText(tv.getText().toString());
+                        LinearLayout rl = (LinearLayout) arg1;
+                        TextView tv = (TextView) rl.getChildAt(0);
+                        TextView tv2 = (TextView) rl.getChildAt(1);
+                        myAutoComplete.setText(tv.getText().toString());
 
-                    String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
+                        String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
 
-                    Bundle bundle=new Bundle();
-                    bundle.putString("city", city);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("city", city);
 
-                    if(resultFragment == null) {
-                        resultFragment = new ResultFragment();
-                    }
-                    else {
-                        getChildFragmentManager().beginTransaction().remove(resultFragment).commit();
-                        resultFragment = new ResultFragment();
-                    }
-                    //set Fragmentclass Arguments
-                    resultFragment.setArguments(bundle);
+                        if(resultFragment == null) {
+                            resultFragment = new ResultFragment();
+                        }
+                        else {
+                            getFragmentManager().beginTransaction().remove(resultFragment);
+                            resultFragment = new ResultFragment();
+                        }
+                        //set Fragmentclass Arguments
+                        resultFragment.setArguments(bundle);
 
 
+                        ((DrawerActivity)getActivity()).setResultFragment(resultFragment);
 
-                    getChildFragmentManager().beginTransaction().add(R.id.result_container, resultFragment).commit();
+//                        getFragmentManager().beginTransaction().replace(R.id.result_container, resultFragment, ResultFragment.class.getSimpleName()).commit();
 
 
 //                    resultFragment.changeCity(city);
 
-                    resultLayout.setVisibility(View.VISIBLE);
-                    searchLayout.setVisibility(View.GONE);
+                        resultLayout.setVisibility(View.VISIBLE);
+                        searchLayout.setVisibility(View.GONE);
 
-                    View view = getActivity().getCurrentFocus();
-                    if (view != null) {
-                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
-                                Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    }
+                        View view = getActivity().getCurrentFocus();
+                        if (view != null) {
+                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                        }
 
 //                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
-                    getChildFragmentManager().executePendingTransactions();
+                        getChildFragmentManager().executePendingTransactions();
 
-                    Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
-                }
+                        Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
+                    }
 
-            });
+                });
 
-            // add the listener so it will tries to suggest while the user types
-            myAutoComplete.addTextChangedListener(new CustomTextChangeListner((DrawerActivity)getActivity()));
+                // add the listener so it will tries to suggest while the user types
+                myAutoComplete.addTextChangedListener(new CustomTextChangeListner((DrawerActivity)getActivity()));
 //
 //            // ObjectItemData has no value at first
 //            City[] ObjectItemData = new City[0];
 //
 //            // set the custom ArrayAdapter
 //            myAdapter = new AutocompleteDBCustomArrayAdapter((DrawerActivity)getActivity(), ObjectItemData);
-            myAdapter = ((DrawerActivity) getActivity()).getArrayAdapter();
-            ((DrawerActivity) getActivity()).setMyAutoComplete(myAutoComplete);
-            myAutoComplete.setAdapter(myAdapter);
+                myAdapter = ((DrawerActivity) getActivity()).getArrayAdapter();
+                ((DrawerActivity) getActivity()).setMyAutoComplete(myAutoComplete);
+                myAutoComplete.setAdapter(myAdapter);
 
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
 
 //        return super.onCreateView(inflater, container, savedInstanceState);
 
         return root;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+
+    }
 
     public ArrayAdapter<City> getArrayAdapter() {
         return myAdapter;

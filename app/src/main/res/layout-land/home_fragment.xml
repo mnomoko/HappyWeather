@@ -25,26 +25,33 @@
                 android:orientation="vertical"
                 android:layout_alignParentTop="true">
 
-                <CheckBox
-                    android:id="@+id/checkBox1"
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:checked="false"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="5dp"
-                    style="?android:attr/starStyle">
-                </CheckBox>
+                    android:layout_marginTop="5dp">
 
-                <mnomoko.android.com.happyweather.algorithme.AutoResizeTextView
-                    android:id="@+id/tvNameCity"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
-                    android:gravity="center"
-                    android:ellipsize="none"
-                    android:maxLines="1"
-                    android:textSize="100sp"/>
+                    <CheckBox
+                        android:id="@+id/checkBox1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:checked="false"
+                        style="?android:attr/starStyle">
+                    </CheckBox>
+
+                    <mnomoko.android.com.happyweather.algorithme.AutoResizeTextView
+                        android:id="@+id/tvNameCity"
+                        android:layout_width="100dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:gravity="center"
+                        android:ellipsize="none"
+                        android:maxLines="1"
+                        android:textSize="100sp"/>
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

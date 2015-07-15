@@ -26,7 +26,7 @@
 
     <string name="drawer_open" translatable="false">Open navigation drawer</string>
     <string name="drawer_close" translatable="false">Close navigation drawer</string>
-    <string name="app_not_available">Désolé il n'y a pas de connexion</string>
+    <string name="app_not_available">Désolé il n\'y a pas de connexion</string>
     <string name="choose_city">Choisir une ville</string>
     <string name="find">Lancer la recherche</string>
     <string name="addCity">Ajouter une ville</string>
@@ -48,4 +48,5 @@
     <string name="localisation_not_found">Votre emplacement n\'a pas été trouvé.</string>
     <string name="error_localisation">Problème GPS</string>
     <string name="no_favorite">Aucune ville n\'a été saisie dans vos favoris</string>
+    <string name="enable_localisation">Veuillez activer votre GPS.</string>
 </resources>

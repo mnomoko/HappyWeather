@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +108,8 @@ public class DataLoader {
 //
 //            }
 
-            String request = daily + city + dailyExtend;
+//            String request = daily + city + dailyExtend;
+            String request = daily + URLEncoder.encode(city, "UTF-8") + dailyExtend;
 //            String request = text + city + extend;
             URL url = new URL(request);
             Log.e("DataLoader", request);

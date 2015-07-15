@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -59,6 +61,7 @@ public class ResultFragment extends Fragment {
     Button btnChangeLinvingCity;
     View root;
     RelativeLayout layout;
+    LinearLayout linearlayout;
 
     String city;
     String favorites;
@@ -83,7 +86,16 @@ public class ResultFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.home_fragment, container, false);
 
-        layout = (RelativeLayout) root.findViewById(R.id.background);
+        if(getActivity().getBaseContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            // code to do for Portrait Mode
+            layout = (RelativeLayout) root.findViewById(R.id.background);
+            DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+        } else {
+            // code to do for Landscape Mode
+            linearlayout = (LinearLayout) root.findViewById(R.id.background);
+            DrawerActivity.setBackgroundView(linearlayout, getActivity(), R.drawable.sun);
+        }
 
         city = null;
 
@@ -222,7 +234,8 @@ public class ResultFragment extends Fragment {
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
             this.dialog.show();
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+//            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         }
 
         @Override
@@ -323,7 +336,16 @@ public class ResultFragment extends Fragment {
 //                    myWallpaperManager.setResource(R.drawable.sun);
 
 //                layout.setBackground(HomeFragment.getDrawable(getActivity(), R.drawable.sun));
-                            DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+
+//                            if(getActivity().getBaseContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+//                            {
+//                                // code to do for Portrait Mode
+//                                DrawerActivity.setBackgroundView(layout, getActivity(), R.drawable.sun);
+//                            } else {
+//                                // code to do for Landscape Mode
+//                                DrawerActivity.setBackgroundView(linearlayout, getActivity(), R.drawable.sun);
+//                            }
+
                             lvDaily.invalidate();
 
                             if (dialog.isShowing()) {

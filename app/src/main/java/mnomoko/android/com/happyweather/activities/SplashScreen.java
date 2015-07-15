@@ -52,6 +52,7 @@ public class SplashScreen extends Activity {
         else {
             SPLASH_TIME_OUT = 5000;
         }
+        SPLASH_TIME_OUT = 0;
 
 //        check if data is already download and when, if it been too far in the pass or if there are nothing download
 //        so the splash screen will appear and data will be load

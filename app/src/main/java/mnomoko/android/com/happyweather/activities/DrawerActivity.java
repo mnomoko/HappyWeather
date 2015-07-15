@@ -67,6 +67,7 @@ import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 import mnomoko.android.com.happyweather.fragment.FavoriteFragment;
 import mnomoko.android.com.happyweather.fragment.HomeFragment;
 import mnomoko.android.com.happyweather.fragment.LocationFragment;
+import mnomoko.android.com.happyweather.fragment.ResultFragment;
 import mnomoko.android.com.happyweather.fragment.SearchFragment;
 import mnomoko.android.com.happyweather.fragment.parent.FragmentHanger;
 
@@ -352,15 +353,23 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
             case R.id.action_location:
 
                 updateUI();
-                if(Double.valueOf(longitude) != 0 && Double.valueOf(latitude) != 0) {
-                    LocationFragment locationFragment = new LocationFragment(longitude, latitude);
-                    locationFragment.show(getSupportFragmentManager(), getResources().getString(R.string.favorite));
+                if(latitude != null && longitude != null) {
+                    if (Double.valueOf(longitude) != 0 && Double.valueOf(latitude) != 0) {
+                        LocationFragment locationFragment = new LocationFragment(longitude, latitude);
+                        locationFragment.show(getSupportFragmentManager(), getResources().getString(R.string.favorite));
+                    } else {
+
+                        new AlertDialog.Builder(this)
+                                .setTitle(R.string.error_localisation)
+                                .setMessage(R.string.localisation_not_found)
+                                .show();
+                    }
                 }
                 else {
 
                     new AlertDialog.Builder(this)
                             .setTitle(R.string.error_localisation)
-                            .setMessage(R.string.localisation_not_found)
+                            .setMessage(R.string.enable_localisation)
                             .show();
                 }
                 return true;
@@ -520,6 +529,12 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         builder.show();
     }
 
+    public void setResultFragment(ResultFragment resultFragment) {
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, resultFragment).addToBackStack(null).commit();
+    }
+
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -535,6 +550,8 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         FragmentTransaction ft = fragmentManager.beginTransaction();
         Fragment fragment;
         boolean beChanged = false;
+
+        deleteBackStack();
 
         switch (position) {
             case 0:
@@ -656,6 +673,13 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
             layout.setBackgroundDrawable(DrawerActivity.getDrawable(context, drawable));
         }
 
+    }
+
+    public void deleteBackStack() {
+        FragmentManager fm = this.getSupportFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
     }
 
     public String dateFromUnix(long unix) {
