@@ -1,9 +1,12 @@
 package mnomoko.android.com.happyweather.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
@@ -21,8 +24,9 @@ import mnomoko.android.com.happyweather.database.MySqlLiteHelper;
 public class SplashScreen extends Activity {
 
     private static String CITIES_FILE = "cities_file.txt";
-    private static int SPLASH_TIME_OUT = 7000;
+    private int SPLASH_TIME_OUT = 0;
     List<String> content = null;
+    SharedPreferences sharedPreferences;
 
     RelativeLayout layout;
 
@@ -38,28 +42,43 @@ public class SplashScreen extends Activity {
 
         DrawerActivity.setBackgroundView(layout, this, R.drawable.sun);
 
-        //check if data is already download and when, if it been too far in the pass or if there are nothing download
-        //so the splash screen will appear and data will be load
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                setDataBase();
-//
-//                Intent i = new Intent(SplashScreen.this, MainActivity.class);
-//                startActivity(i);
-//            }
-//        }, SPLASH_TIME_OUT);
+        sharedPreferences = getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
 
-        setDataBase();
-        Intent i = new Intent(SplashScreen.this, MainActivity.class);
-        startActivity(i);
+        //
+        int first = sharedPreferences.getInt(DrawerActivity.APP_DATA_FIRST, 0);
+        if(first == 1) {
+            SPLASH_TIME_OUT = 1500;
+        }
+        else {
+            SPLASH_TIME_OUT = 5000;
+        }
+
+//        check if data is already download and when, if it been too far in the pass or if there are nothing download
+//        so the splash screen will appear and data will be load
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                setDataBase();
+
+                Intent i = new Intent(SplashScreen.this, MainActivity.class);
+                startActivity(i);
+
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(DrawerActivity.APP_DATA_FIRST, 1);
+            }
+        }, SPLASH_TIME_OUT);
+
+//        setDataBase();
+//        Intent i = new Intent(SplashScreen.this, MainActivity.class);
+//        startActivity(i);
     }
 
     public void setDataBase() {
         MySqlLiteHelper db = new MySqlLiteHelper(this);
 //        db.dropTable();
-//        db.createTable();
+        db.createTable();
 //        for(City c : db.getAllCities()) {
 //            db.deleteCity(c);
 //        }

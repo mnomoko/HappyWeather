@@ -23,6 +23,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutionException;
+
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
 import mnomoko.android.com.happyweather.algorithme.CustomAutoCompleteTextViewDB;
@@ -69,7 +71,7 @@ public class AddFavoriteFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
 
-//        handler.sendEmptyMessage(0);
+        handler.sendEmptyMessage(0);
     }
 
     @Override
@@ -117,9 +119,9 @@ public class AddFavoriteFragment extends DialogFragment {
 
                     String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
 
-                    run(tv.getText().toString(), tv2.getText().toString());
-
                     getChildFragmentManager().beginTransaction().detach(AddFavoriteFragment.this).commit();
+
+                    run(tv.getText().toString(), tv2.getText().toString());
 
                 }
 
@@ -183,7 +185,13 @@ public class AddFavoriteFragment extends DialogFragment {
         //Toast.makeText(AddFavoriteCity.this, vill + "," + pays, Toast.LENGTH_LONG).show();
         ville = vill + "," + pays;
 //        ville = ville.replace(" ", "-");
-        new RequestTaskChecker((DrawerActivity)getActivity()).execute(ville);
+        try {
+            new RequestTaskChecker((DrawerActivity)getActivity()).execute(ville).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -233,6 +241,7 @@ public class AddFavoriteFragment extends DialogFragment {
                         editor.putString(DrawerActivity.APP_DATA_LIVING_CITY, ville);
 
                         editor.commit();
+                        AddFavoriteFragment.this.dismiss();
 //                        Intent it = new Intent(AddFavoriteCity.this, Accueil.class);
 //                        it.putExtra("name", sharedpreferences.getString(City, ""));
 //                        startActivity(it);

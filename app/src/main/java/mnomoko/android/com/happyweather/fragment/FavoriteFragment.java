@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -37,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
 import mnomoko.android.com.happyweather.R;
 import mnomoko.android.com.happyweather.activities.DrawerActivity;
@@ -57,7 +57,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     CirclePagerIndicator circlePagerIndicator;
     private Float lastX;
     ImageView image;
-    TextView name;
+//    TextView name;
     TextView degrees;
 
 
@@ -77,6 +77,28 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     LinearLayout layout;
 //    RelativeLayout layout;
 
+
+//    String name;
+//    String temp;
+//    String tempMin;
+//    String tempMax;
+//    String wind;
+//    String humidity;
+//    String icon;
+
+
+    ArrayList<String> listname;
+    ArrayList<String> listtemp;
+    ArrayList<String> listtempMin;
+    ArrayList<String> listtempMax;
+    ArrayList<String> listwind;
+    ArrayList<String> listhumidity;
+    ArrayList<String> listicon;
+    int current;
+
+    ArrayList<Weather> weathers;
+    ArrayList<ArrayList<Weather>> listWeather;
+
     String city;
     String favorites;
 
@@ -92,6 +114,16 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
+
+        listname = new ArrayList<>();
+        listtemp = new ArrayList<>();
+        listtempMin = new ArrayList<>();
+        listtempMax = new ArrayList<>();
+        listwind = new ArrayList<>();
+        listhumidity = new ArrayList<>();
+        listicon = new ArrayList<>();
 
 
         this.setRetainInstance(true);
@@ -139,55 +171,114 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 
         Log.e("SharedPreferences", sharedpreferences.getAll().toString());
 
-        setFlipperContent();
+        listWeather = new ArrayList<>();
+
+        if(savedInstanceState == null) {
+
+            setFlipperContent();
+        }
+        else {
+
+            ArrayList<ArrayList<Weather>> temp = new ArrayList<>();
+
+            int size = savedInstanceState.getInt("SIZE");
+            listicon = savedInstanceState.getStringArrayList("ICON");
+            listname = savedInstanceState.getStringArrayList("NAME");
+            listtemp = savedInstanceState.getStringArrayList("TEMP");
+            listtempMin = savedInstanceState.getStringArrayList("MIN");
+            listtempMax = savedInstanceState.getStringArrayList("MAX");
+            listhumidity = savedInstanceState.getStringArrayList("HUMIDITY");
+            listwind = savedInstanceState.getStringArrayList("WIND");
+
+            for(int i = 0; i < size; i++) {
+
+                LayoutInflater inflat = (LayoutInflater) getActivity()
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = inflat.inflate(R.layout.favorite_fragment_item, null);
+
+                layout = (LinearLayout) view.findViewById(R.id.background);
+
+                //DEFINE
+                imgViewWeather = (ImageView) view.findViewById(R.id.imgViewWeather);
+//                tvNameCity = (AutoResizeTextView) view.findViewById(R.id.tvNameCity);
+                tvNameCity = (AutoResizeTextView) view.findViewById(R.id.tvNameCity);
+                tvNameDegres = (TextView) view.findViewById(R.id.tvNameDegrees);
+                tvNameDegres.setTextSize(tvNameDegres.getTextSize() * (3 / 2));
+                tvNameMinDegres = (TextView) view.findViewById(R.id.tvNameMinDegres);
+                tvNameMaxDegres = (TextView) view.findViewById(R.id.tvNameMaxDegres);
+                tvNameHumidity = (TextView) view.findViewById(R.id.tvNameHumidity);
+                tvNameWind = (TextView) view.findViewById(R.id.tvNameWind);
+
+                lvDaily = (ListView) view.findViewById(R.id.lvDaily);
+
+                //SET
+                imgViewWeather.setImageResource(getActivity().getResources().getIdentifier("_" + listicon.get(i), "drawable", getActivity().getPackageName()));
+
+                tvNameCity.setText(listname.get(i), TextView.BufferType.NORMAL);
+
+                tvNameDegres.setText(listtemp.get(i) + " C°");
+
+                tvNameMinDegres.setText("min : " + listtempMin.get(i) + " C°");
+
+                tvNameMaxDegres.setText("max : " + listtempMax.get(i) + " C°");
+
+                tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + listhumidity.get(i));
+
+                tvNameWind.setText(getResources().getString(R.string.wind) + " : " + listwind.get(i));
+
+                weathers = savedInstanceState.getParcelableArrayList("WEATHER_" + i);
+                lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
+                lvDaily.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(detector.onTouchEvent(event)){
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                temp.add(weathers);
+
+                FavoriteFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
+                viewFlipper.addView(view);
+            }
+            int position = savedInstanceState.getInt("CURRENT");
+            listWeather = temp;
+
+            int i = 0;
+            if(viewFlipper.getDisplayedChild() != position) {
+//                do {
+//                    viewFlipper.showNext();
+//                    i++;
+//                }
+                while(i != position && i < viewFlipper.getChildCount()) {
+                    i++;
+                }
+                viewFlipper.setDisplayedChild(i);
+            }
+        }
 
         return root;
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle bundle) {
-//        View v;
-//
-//        ImageView _imgViewWeather;
-//        TextView _tvNameDegres;
-//        TextView _tvNameCity;
-//        TextView _tvNameMinDegres;
-//        TextView _tvNameMaxDegres;
-//        TextView _tvNameHumidity;
-//        TextView _tvNameWind;
-//        ListView _lvDaily;
-//        CheckBox _checkbox;
-//
-//        for(int i = 0; i < viewFlipper.getChildCount(); i++) {
-//            v = viewFlipper.getChildAt(i);
-//
-//            _imgViewWeather = (ImageView) v.findViewById(R.id.imgViewWeather);
-//            _tvNameCity = (TextView) v.findViewById(R.id.tvNameCity);
-//            _tvNameDegres = (TextView) v.findViewById(R.id.tvNameDegrees);
-//            _tvNameMinDegres = (TextView) v.findViewById(R.id.tvNameMinDegres);
-//            _tvNameMaxDegres = (TextView) v.findViewById(R.id.tvNameMaxDegres);
-//            _tvNameHumidity = (TextView) v.findViewById(R.id.tvNameHumidity);
-//            _tvNameWind = (TextView) v.findViewById(R.id.tvNameWind);
-//            _lvDaily = (ListView) v.findViewById(R.id.lvDaily);
-//
-//            bundle.putString("_tvNameCity", _tvNameCity.getText().toString());
-//            bundle.putString("_tvNameDegres", _tvNameDegres.getText().toString());
-//            bundle.putString("_tvNameMinDegres", _tvNameMinDegres.getText().toString());
-//            bundle.putString("_tvNameMaxDegres", _tvNameMaxDegres.getText().toString());
-//            bundle.putString("_tvNameHumidity", _tvNameHumidity.getText().toString());
-//            bundle.putString("_tvNameWind", _tvNameWind.getText().toString());
-//        }
-//        bundle.putInt("number", viewFlipper.getChildCount());
-//    }
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//
-//        int size = savedInstanceState.getInt("number");
-//        for(int i = 0; i < size; i++) {
-//
-//        }
-//    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("NAME", listname);
+        outState.putStringArrayList("TEMP", listtemp);
+        outState.putStringArrayList("MIN", listtempMin);
+        outState.putStringArrayList("MAX", listtempMax);
+        outState.putStringArrayList("WIND", listwind);
+        outState.putStringArrayList("HUMIDITY", listhumidity);
+        outState.putStringArrayList("ICON", listicon);
+        for(int i = 0; i < listWeather.size(); i++) {
+            ArrayList weath = listWeather.get(i);
+            outState.putParcelableArrayList("WEATHER_" + i, weath);
+        }
+        outState.putInt("SIZE", listWeather.size());
+        outState.putInt("CURRENT", viewFlipper.getDisplayedChild());
+    }
 
     private void setFlipperContent() {
 //        List<Stuff> aux=getStuffList();
@@ -220,7 +311,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         private DrawerActivity activity;
         public LaunchRequest(DrawerActivity activity) {
             this.activity = activity;
-            context = activity;
+            context = this.activity;
             dialog = new ProgressDialog(context);
         }
 
@@ -228,6 +319,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
             this.dialog.show();
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         }
 
         @Override
@@ -273,7 +365,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
 
 //                layout = (RelativeLayout) view.findViewById(R.id.background);
 
-                        List<Weather> weathers = new ArrayList<>();
+                        weathers = new ArrayList<>();
 
                         checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
                         checkbox.setOnClickListener(new View.OnClickListener() {
@@ -387,12 +479,22 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                                 }
                                 return false;
                             }
-                        });/*new CustomGestureDetectorListView(lvDaily));*/
+                        });
+                        /*new CustomGestureDetectorListView(lvDaily));*/
                         FavoriteFragment.setBackgroundView(layout, getActivity(), R.drawable.sun);
 //                FavoriteFragment.setBackgroundView(bigLayout, getActivity(), R.drawable.sun);
 
 
 //                lvDaily.invalidate();
+                        //FOR SAVEDINSTANCESTATE
+                        listname.add(name);
+                        listtemp.add(temp);
+                        listtempMin.add(tempMin);
+                        listtempMax.add(tempMax);
+                        listwind.add(wind);
+                        listhumidity.add(humidity);
+                        listicon.add(icon);
+                        listWeather.add(weathers);
 
                         viewFlipper.addView(view);
                         circlePagerIndicator.setCurrentDisplayedChild(0);
@@ -401,6 +503,8 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                         if (dialog.isShowing()) {
                             dialog.dismiss();
                         }
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
                     } catch (JSONException e) {
                         Log.e(getActivity().getLocalClassName(), "_" + e.getMessage());
                     }
@@ -414,10 +518,6 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     public boolean dispatchTouchEvent(MotionEvent event) {
         getActivity().dispatchTouchEvent(event);
         return detector.onTouchEvent(event);
-    }
-
-    public void setFlipperContent(List<Weather> vawe) {
-
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

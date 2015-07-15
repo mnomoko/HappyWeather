@@ -53,7 +53,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
 
     public void createTable() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String CREATE_CITY_TABLE = "CREATE TABLE cities ( " +
+        String CREATE_CITY_TABLE = "CREATE TABLE IF NOT EXISTS cities ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT, "+
                 "code TEXT )";

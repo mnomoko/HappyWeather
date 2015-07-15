@@ -81,6 +81,7 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
     public static final String APP_DATA = "Application_Happy_Weather";
     public static final String APP_DATA_LIVING_CITY = "Application_Happy_Weather_Living_City";
     public static final String APP_DATA_FAVORITES_CITY = "Application_Happy_Weather_Favorites_City";
+    public static final String APP_DATA_FIRST = "Application_Happy_Weather_First_Time";
 
     public static Context context;
 
@@ -351,12 +352,16 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
             case R.id.action_location:
 
                 updateUI();
-                if(Double.valueOf(longitude) == 0 && Double.valueOf(latitude) == 0) {
+                if(Double.valueOf(longitude) != 0 && Double.valueOf(latitude) != 0) {
                     LocationFragment locationFragment = new LocationFragment(longitude, latitude);
                     locationFragment.show(getSupportFragmentManager(), getResources().getString(R.string.favorite));
                 }
                 else {
 
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.error_localisation)
+                            .setMessage(R.string.localisation_not_found)
+                            .show();
                 }
                 return true;
             default:
@@ -529,6 +534,7 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         Fragment fragment;
+        boolean beChanged = false;
 
         switch (position) {
             case 0:
@@ -538,22 +544,46 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
                 }
                 fragment = homeFragment;
                 ft.replace(R.id.container, fragment).commit();
+                beChanged = true;
                 break;
             case 1:
 //                fragment = new FavoriteFragment();
-                if(favoriteFragment == null) {
-                    favoriteFragment = new FavoriteFragment();
+
+                sharedpreferences = this.getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
+                String favorites = sharedpreferences.getString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
+
+                if(favorites != "") {
+                    if (favoriteFragment == null) {
+                        favoriteFragment = new FavoriteFragment();
+                    }
+                    fragment = favoriteFragment;
+                    ft.replace(R.id.container, fragment).commit();
+                    beChanged = true;
                 }
-                fragment = favoriteFragment;
-                ft.replace(R.id.container, fragment).commit();
+                else {
+                    final Fragment frag = homeFragment;
+                    final FragmentTransaction transaction = ft;
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.favorite)
+                            .setMessage(R.string.no_favorite)
+                            .setCancelable(false)
+                            .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    transaction.replace(R.id.container, frag).commit();
+                                }
+                            }).show();
+                    beChanged = false;
+                }
                 break;
             case 2:
-//                fragment = new SearchFragment();
                 if(searchFragment == null) {
                     searchFragment = new SearchFragment();
                 }
                 fragment = searchFragment;
                 ft.replace(R.id.container, fragment).commit();
+                beChanged = true;
                 break;
         }
         // update the main content by replacing fragments
@@ -566,8 +596,10 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
 //        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
 
         // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
+        if(beChanged) {
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mPlanetTitles[position]);
+        }
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 

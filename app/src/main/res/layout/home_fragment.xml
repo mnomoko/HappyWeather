@@ -23,12 +23,11 @@
             <mnomoko.android.com.happyweather.algorithme.AutoResizeTextView
                 android:id="@+id/tvNameCity"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_above="@+id/imgViewWeather"
                 android:gravity="center"
-                android:ellipsize="none"
                 android:maxLines="1"
-                android:textSize="100sp"/>
+                android:textSize="110sp"/>
 
             <ImageView
                 android:id="@+id/imgViewWeather"

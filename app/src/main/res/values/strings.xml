@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">HappyWeather</string>
+    <string name="app_name" translatable="false">Happy Weather</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="acceder_au_favori">Accéder aux favoris</string>
 
@@ -10,7 +9,7 @@
     <string name="favorite">Favori</string>
     <string name="search_city">Chercher une ville</string>
 
-    <string name="ok">Ok</string>
+    <string name="ok" translatable="false">Ok</string>
     <string name="cancel">Annulé</string>
 
     <string-array name="titles_array">
@@ -19,16 +18,15 @@
         <item>@string/search_city</item>
     </string-array>
 
-    <string name="icon">weathear_icon</string>
-    <string name="city">City</string>
+    <string name="icon" translatable="false">weathear_icon</string>
+    <string name="city">Ville</string>
     <string name="degrees">Degrés</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>
 
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-    <string name="action_websearch">Web search</string>
-    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="app_not_available">Désolé il n'y a pas de connexion</string>
     <string name="choose_city">Choisir une ville</string>
     <string name="find">Lancer la recherche</string>
     <string name="addCity">Ajouter une ville</string>
@@ -47,4 +45,7 @@
     <string name="data">Données mobile</string>
     <string name="error_connection">Vos données mobile ne sont pas activé.\\nVeuillez à changer vos paramètres.</string>
     <string name="enable_data">Activer les données mobile</string>
+    <string name="localisation_not_found">Votre emplacement n\'a pas été trouvé.</string>
+    <string name="error_localisation">Problème GPS</string>
+    <string name="no_favorite">Aucune ville n\'a été saisie dans vos favoris</string>
 </resources>

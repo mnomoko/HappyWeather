@@ -3,6 +3,7 @@ package mnomoko.android.com.happyweather.fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,7 +63,15 @@ public class ResultFragment extends Fragment {
     String city;
     String favorites;
 
-    List<Weather> weathers;
+    ArrayList<Weather> weathers;
+
+    String name;
+    String temp;
+    String tempMin;
+    String tempMax;
+    String wind;
+    String humidity;
+    String icon;
 
     boolean first = true;
 
@@ -80,10 +89,6 @@ public class ResultFragment extends Fragment {
 
         sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
         favorites = sharedpreferences.getString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
-
-//        SharedPreferences.Editor editor = sharedpreferences.edit();
-//        editor.putString(DrawerActivity.APP_DATA_FAVORITES_CITY, "");
-//        editor.commit();
 
         fm = getChildFragmentManager();
         imgViewWeather = (ImageView) root.findViewById(R.id.imgViewWeather);
@@ -140,17 +145,58 @@ public class ResultFragment extends Fragment {
         Log.e("SharedPreferences", sharedpreferences.getAll().toString());
 
 
+        if(savedInstanceState == null) {
 
-        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
-        if(!connect) {
+            boolean connect = ((DrawerActivity) getActivity()).checkConnection();
+            if (!connect) {
 
-            ((DrawerActivity) getActivity()).showConnectionError();
-        }
-        else {
-            new LaunchRequest((DrawerActivity) getActivity()).execute(bundleCity);
+                ((DrawerActivity) getActivity()).showConnectionError();
+            } else {
+                new LaunchRequest((DrawerActivity) getActivity()).execute(bundleCity);
+            }
+
+        } else {
+
+            icon = savedInstanceState.getString("ICON");
+            imgViewWeather.setImageResource(getActivity().getResources().getIdentifier("_"+icon, "drawable", getActivity().getPackageName()));
+
+            name = savedInstanceState.getString("NAME");
+            tvNameCity.setText(name, TextView.BufferType.EDITABLE);
+
+            temp = savedInstanceState.getString("TEMP");
+            tvNameDegres.setText(temp + " C°");
+
+            tempMin = savedInstanceState.getString("MIN");
+            tvNameMinDegres.setText("min : " + tempMin + " C°");
+
+            tempMax = savedInstanceState.getString("MAX");
+            tvNameMaxDegres.setText("max : " + tempMax + " C°");
+
+            humidity = savedInstanceState.getString("HUMIDITY");
+            tvNameHumidity.setText(getResources().getString(R.string.humidity) + " : " + humidity);
+
+            wind = savedInstanceState.getString("WIND");
+            tvNameWind.setText(getResources().getString(R.string.wind) + " : " + wind);
+
+
+            weathers = savedInstanceState.getParcelableArrayList("WEATHER");
+            lvDaily.setAdapter(new DailyAdapter(getActivity(), weathers));
         }
 
         return root;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("NAME", name);
+        outState.putString("TEMP", temp);
+        outState.putString("MIN", tempMin);
+        outState.putString("MAX", tempMax);
+        outState.putString("WIND", wind);
+        outState.putString("HUMIDITY", humidity);
+        outState.putString("ICON", icon);
+        outState.putParcelableArrayList("WEATHER", weathers);
     }
 
     @Override
@@ -176,6 +222,7 @@ public class ResultFragment extends Fragment {
         protected void onPreExecute() {
             this.dialog.setMessage("Chargement..");
             this.dialog.show();
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         }
 
         @Override
@@ -203,7 +250,7 @@ public class ResultFragment extends Fragment {
                         try {
                             JSONObject object = new JSONObject(json);
 
-                            String name = object.getJSONObject("city").getString("name");
+                            name = object.getJSONObject("city").getString("name");
 
                             JSONArray list = object.getJSONArray("list");
                             JSONObject first = list.getJSONObject(0);
@@ -225,14 +272,14 @@ public class ResultFragment extends Fragment {
 //                    }
                             }
 
-                            String temp = first.getJSONObject("temp").getString("day");
-                            String tempMin = first.getJSONObject("temp").getString("min");
-                            String tempMax = first.getJSONObject("temp").getString("max");
+                            temp = first.getJSONObject("temp").getString("day");
+                            tempMin = first.getJSONObject("temp").getString("min");
+                            tempMax = first.getJSONObject("temp").getString("max");
                             String pressure = first.getString("pressure");
-                            String wind = first.getString("speed");
-                            String humidity = first.getString("humidity");
+                            wind = first.getString("speed");
+                            humidity = first.getString("humidity");
 
-                            String icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
+                            icon = first.getJSONArray("weather").getJSONObject(0).getString("icon");
                             String main = first.getJSONArray("weather").getJSONObject(0).getString("main"); //FOR WALLPAPER
                             //new DownloadImageTask((ImageView) root.findViewById(R.id.imgViewWeather)).execute(icon + ".png");
                             imgViewWeather.setImageResource(_context.getResources().getIdentifier("_"+icon, "drawable", _context.getPackageName()));
@@ -282,6 +329,7 @@ public class ResultFragment extends Fragment {
                             if (dialog.isShowing()) {
                                 dialog.dismiss();
                             }
+                            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                         }
                         catch (JSONException e) {
                             Log.e(getActivity().getLocalClassName(), "_"+e.getMessage());
