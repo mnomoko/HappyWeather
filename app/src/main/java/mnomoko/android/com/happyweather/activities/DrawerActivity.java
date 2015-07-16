@@ -508,6 +508,14 @@ public class DrawerActivity extends AppCompatActivity implements FragmentHanger.
         }
     }
 
+    public void noConnection() {
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.data)
+                .setMessage(R.string.no_connexion)
+                .show();
+    }
+
     public void showConnectionError() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.error_connection)

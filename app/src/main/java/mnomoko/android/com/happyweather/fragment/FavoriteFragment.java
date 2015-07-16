@@ -293,7 +293,8 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
             boolean connect = ((DrawerActivity)getActivity()).checkConnection();
             if(!connect) {
 
-                ((DrawerActivity) getActivity()).showConnectionError();
+                ((DrawerActivity) getActivity()).noConnection();
+//                ((DrawerActivity) getActivity()).showConnectionError();
             }
             else {
                 new LaunchRequest((DrawerActivity) getActivity()).execute(cities[i]);

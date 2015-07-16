@@ -49,4 +49,6 @@
     <string name="error_localisation">Problème GPS</string>
     <string name="no_favorite">Aucune ville n\'a été saisie dans vos favoris</string>
     <string name="enable_localisation">Veuillez activer votre GPS.</string>
+
+    <string name="no_connexion">Aucune connexion réseau n\'a été détecté</string>
 </resources>

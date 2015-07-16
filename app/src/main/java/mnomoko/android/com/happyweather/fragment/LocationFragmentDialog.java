@@ -121,7 +121,8 @@ public class LocationFragmentDialog extends Fragment {
         boolean connect = ((DrawerActivity)getActivity()).checkConnection();
         if(!connect) {
 
-            ((DrawerActivity) getActivity()).showConnectionError();
+            ((DrawerActivity) getActivity()).noConnection();
+//            ((DrawerActivity) getActivity()).showConnectionError();
         }
         else {
             new LaunchRequest((DrawerActivity)getActivity()).execute(lon, lat);

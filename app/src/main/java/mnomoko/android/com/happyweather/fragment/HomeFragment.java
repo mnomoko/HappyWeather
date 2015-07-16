@@ -139,6 +139,8 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+        hideCheckbox();
+
         btnChangeLinvingCity = (Button) root.findViewById(R.id.btnChangeLinvingCity);
         btnChangeLinvingCity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +163,7 @@ public class HomeFragment extends Fragment {
             boolean connect = ((DrawerActivity) getActivity()).checkConnection();
             if (connect) {
 
+                showCheckbox();
                 if (favo == null) {
                     //show a dialog which add a name in favo
                     AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
@@ -173,7 +176,9 @@ public class HomeFragment extends Fragment {
                 }
             } else {
 
-                ((DrawerActivity) getActivity()).showConnectionError();
+                ((DrawerActivity) getActivity()).noConnection();
+                hideCheckbox();
+//                ((DrawerActivity) getActivity()).showConnectionError();
             }
         } else {
 
@@ -219,6 +224,14 @@ public class HomeFragment extends Fragment {
         outState.putString("HUMIDITY", humidity);
         outState.putString("ICON", icon);
         outState.putParcelableArrayList("WEATHER", weathers);
+    }
+
+    public void showCheckbox() {
+        checkbox.setVisibility(View.VISIBLE);
+    }
+
+    public void hideCheckbox() {
+        checkbox.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -373,15 +386,16 @@ public class HomeFragment extends Fragment {
             sharedpreferences = getActivity().getSharedPreferences(DrawerActivity.APP_DATA, Context.MODE_PRIVATE);
             String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
 
-            if(favo == null) {
-                //show a dialog which add a name in favo
-                AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
+            if(((DrawerActivity)getActivity()).checkConnection()) {
+                if (favo == null) {
+                    //show a dialog which add a name in favo
+                    AddFavoriteFragment alertdFragment = new AddFavoriteFragment(new YourDialogFragmentDismissHandler());
 //            Log.e("HomeFragment.class", fm.toString());
-                alertdFragment.show(fm, getResources().getString(R.string.favorite));
-            }
-            else {
-                weathers = new ArrayList<>();
-                new LaunchRequest((DrawerActivity)getActivity()).execute(favo);
+                    alertdFragment.show(fm, getResources().getString(R.string.favorite));
+                } else {
+                    weathers = new ArrayList<>();
+                    new LaunchRequest((DrawerActivity) getActivity()).execute(favo);
+                }
             }
 
         }

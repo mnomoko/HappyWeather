@@ -30,4 +30,6 @@
     <string name="action_settings">Settings</string>
     <string name="addCity">Add one city</string>
     <string name="acceder_au_favori">Go to favorites</string>
+
+    <string name="no_connexion">No data has been detected, please retry later</string>
 </resources>

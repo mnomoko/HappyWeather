@@ -92,48 +92,56 @@ public class SearchFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
 
-                        LinearLayout rl = (LinearLayout) arg1;
-                        TextView tv = (TextView) rl.getChildAt(0);
-                        TextView tv2 = (TextView) rl.getChildAt(1);
-                        myAutoComplete.setText(tv.getText().toString());
+                        //Check is connection network has been find
+                        if(((DrawerActivity)getActivity()).checkConnection()) {
 
-                        String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
+                            LinearLayout rl = (LinearLayout) arg1;
+                            TextView tv = (TextView) rl.getChildAt(0);
+                            TextView tv2 = (TextView) rl.getChildAt(1);
+                            myAutoComplete.setText(tv.getText().toString());
 
-                        Bundle bundle=new Bundle();
-                        bundle.putString("city", city);
+                            String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
 
-                        if(resultFragment == null) {
-                            resultFragment = new ResultFragment();
-                        }
-                        else {
-                            getFragmentManager().beginTransaction().remove(resultFragment);
-                            resultFragment = new ResultFragment();
-                        }
-                        //set Fragmentclass Arguments
-                        resultFragment.setArguments(bundle);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("city", city);
+
+                            if (resultFragment == null) {
+                                resultFragment = new ResultFragment();
+                            } else {
+                                getFragmentManager().beginTransaction().remove(resultFragment);
+                                resultFragment = new ResultFragment();
+                            }
+                            //set Fragmentclass Arguments
+                            resultFragment.setArguments(bundle);
 
 
-                        ((DrawerActivity)getActivity()).setResultFragment(resultFragment);
+                            ((DrawerActivity) getActivity()).setResultFragment(resultFragment);
 
 //                        getFragmentManager().beginTransaction().replace(R.id.result_container, resultFragment, ResultFragment.class.getSimpleName()).commit();
 
 
 //                    resultFragment.changeCity(city);
 
-                        resultLayout.setVisibility(View.VISIBLE);
-                        searchLayout.setVisibility(View.GONE);
+                            resultLayout.setVisibility(View.VISIBLE);
+                            searchLayout.setVisibility(View.GONE);
 
-                        View view = getActivity().getCurrentFocus();
-                        if (view != null) {
-                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
-                                    Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        }
+                            View view = getActivity().getCurrentFocus();
+                            if (view != null) {
+                                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                                        Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                            }
 
 //                    getChildFragmentManager().beginTransaction().add(R.id.container,  resultFragment).commit();
-                        getChildFragmentManager().executePendingTransactions();
+                            getChildFragmentManager().executePendingTransactions();
 
-                        Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
+                            Log.e("Unknown TEST", tv.getText().toString() + " : " + tv2.getText().toString());
+                        }
+                        else {
+
+                            myAutoComplete.setText("");
+                            ((DrawerActivity) getActivity()).noConnection();
+                        }
                     }
 
                 });

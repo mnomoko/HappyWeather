@@ -112,17 +112,24 @@ public class AddFavoriteFragment extends DialogFragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View arg1, int pos, long id) {
 
-                    LinearLayout rl = (LinearLayout) arg1;
-                    TextView tv = (TextView) rl.getChildAt(0);
-                    TextView tv2 = (TextView) rl.getChildAt(1);
-                    myAutoComplete.setText(tv.getText().toString());
 
-                    String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
+                    if(((DrawerActivity) getActivity()).checkConnection()) {
+                        LinearLayout rl = (LinearLayout) arg1;
+                        TextView tv = (TextView) rl.getChildAt(0);
+                        TextView tv2 = (TextView) rl.getChildAt(1);
+                        myAutoComplete.setText(tv.getText().toString());
 
-                    getChildFragmentManager().beginTransaction().detach(AddFavoriteFragment.this).commit();
+                        String city = tv.getText().toString() + "," + tv2.getText().toString().toUpperCase();
 
-                    run(tv.getText().toString(), tv2.getText().toString());
+                        getChildFragmentManager().beginTransaction().detach(AddFavoriteFragment.this).commit();
 
+                        run(tv.getText().toString(), tv2.getText().toString());
+                    }
+                    else {
+
+                        myAutoComplete.setText("");
+                        ((DrawerActivity) getActivity()).noConnection();
+                    }
                 }
 
             });
