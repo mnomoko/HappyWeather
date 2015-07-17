@@ -14,6 +14,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -77,6 +80,8 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true);
 
         root = inflater.inflate(R.layout.home_fragment, container, false);
 
@@ -292,6 +297,7 @@ public class HomeFragment extends Fragment {
                         JSONObject first = list.getJSONObject(0);
 
                         city = name + "," + object.getJSONObject("city").getString("country");
+                        name = city;
                         Log.e("HomeFragment", "favorites = "+favorites);
                         if(favorites != null) {
                             List<String> array = Arrays.asList(favorites.split(";"));
@@ -375,6 +381,33 @@ public class HomeFragment extends Fragment {
             });
 
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.menu_main_two, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.action_refresh) {
+
+            if(((DrawerActivity)getActivity()).checkConnection()) {
+
+                String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
+                if(favo != null) {
+                    new LaunchRequest((DrawerActivity) getActivity()).execute(favo);
+                }
+            }
+            else {
+
+                ((DrawerActivity)getActivity()).noConnection();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class YourDialogFragmentDismissHandler extends Handler {

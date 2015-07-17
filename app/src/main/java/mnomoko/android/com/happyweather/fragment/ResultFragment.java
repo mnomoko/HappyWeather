@@ -14,6 +14,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,13 +78,17 @@ public class ResultFragment extends Fragment {
     String humidity;
     String icon;
 
+    String bundleCity;
+
     boolean first = true;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        String bundleCity =getArguments().getString("city");
+        setHasOptionsMenu(true);
+
+        bundleCity =getArguments().getString("city");
 
         View root = inflater.inflate(R.layout.home_fragment, container, false);
 
@@ -170,6 +176,8 @@ public class ResultFragment extends Fragment {
 
         } else {
 
+            bundleCity = savedInstanceState.getString("BUNDLE");
+
             icon = savedInstanceState.getString("ICON");
             imgViewWeather.setImageResource(getActivity().getResources().getIdentifier("_"+icon, "drawable", getActivity().getPackageName()));
 
@@ -210,12 +218,37 @@ public class ResultFragment extends Fragment {
         outState.putString("HUMIDITY", humidity);
         outState.putString("ICON", icon);
         outState.putParcelableArrayList("WEATHER", weathers);
+
+        outState.putString("BUNDLE", bundleCity);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.menu_main_two, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        return true;
+
+        if(item.getItemId() == R.id.action_refresh) {
+
+            if(((DrawerActivity)getActivity()).checkConnection()) {
+
+                String favo = sharedpreferences.getString(DrawerActivity.APP_DATA_LIVING_CITY, null);
+                if(favo != null) {
+                    new LaunchRequest((DrawerActivity) getActivity()).execute(bundleCity);
+                }
+                return true;
+            }
+            else {
+
+                ((DrawerActivity)getActivity()).noConnection();
+                return false;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public class LaunchRequest extends AsyncTask<String, String, String> {
@@ -270,6 +303,7 @@ public class ResultFragment extends Fragment {
                             JSONObject first = list.getJSONObject(0);
 
                             city = name + "," + object.getJSONObject("city").getString("country");
+                            name = city;
                             Log.e("HomeFragment", "favorites = "+favorites);
                             if(favorites != null) {
                                 List<String> array = Arrays.asList(favorites.split(";"));

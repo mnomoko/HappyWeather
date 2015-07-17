@@ -17,6 +17,9 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,6 +135,8 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true);
 
         root = inflater.inflate(R.layout.favorite_fragment, null);
 
@@ -286,21 +291,52 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
         int end = cities.length;
 
         Log.e("FavoriteFragment", cities.length + " : " + favorites);
-        for (int i = 0; i < end; i++) {
-            Log.e("Favorite", cities[i]);
 
 
-            boolean connect = ((DrawerActivity)getActivity()).checkConnection();
-            if(!connect) {
+        boolean connect = ((DrawerActivity)getActivity()).checkConnection();
+        if(!connect) {
 
-                ((DrawerActivity) getActivity()).noConnection();
+            ((DrawerActivity) getActivity()).noConnection();
 //                ((DrawerActivity) getActivity()).showConnectionError();
-            }
-            else {
+        }
+        else {
+            for (int i = 0; i < end; i++) {
+                Log.e("Favorite", cities[i]);
                 new LaunchRequest((DrawerActivity) getActivity()).execute(cities[i]);
             }
         }
         circlePagerIndicator.invalidate();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.menu_main_two, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.action_refresh) {
+
+            if(((DrawerActivity)getActivity()).checkConnection()) {
+
+                String[] cities = favorites.split(";");
+                int end = cities.length;
+                for (int i = 0; i < end; i++) {
+                    Log.e("Favorite", cities[i]);
+                    viewFlipper.removeAllViews();
+                    new LaunchRequest((DrawerActivity) getActivity()).execute(cities[i]);
+                }
+                return true;
+            }
+            else {
+                ((DrawerActivity)getActivity()).noConnection();
+                return false;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public class LaunchRequest extends AsyncTask<String, String, String> {
@@ -356,6 +392,7 @@ public class FavoriteFragment extends Fragment implements SwipeListener {
                         JSONObject first = list.getJSONObject(0);
 
                         city = name + "," + object.getJSONObject("city").getString("country");
+                        name = city;
                         Log.e("HomeFragment", "+" + favorites);
 
                         LayoutInflater inflater = (LayoutInflater) getActivity()
